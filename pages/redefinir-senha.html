@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Redefinir Senha</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    img {
+      max-width: 100px;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    input {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: white;
+    }
+    button {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #218838;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .alert-box {
+      background-color: #ffdddd;
+      border: 1px solid #ff5c5c;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 10px;
+      color: #800000;
+      font-weight: bold;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .info-box {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo">
+  <h1>Redefinir Senha</h1>
+
+  <form id="redefinirSenhaForm">
+    <input type="text" id="token" placeholder="Digite o token" required />
+    <input type="password" id="novaSenha" placeholder="Nova senha" required />
+    <input type="password" id="confirmarSenha" placeholder="Confirme a nova senha" required />
+    <button type="submit">Redefinir senha</button>
+  </form>
+
+  <footer>
+    <div class="alert-box">
+      Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
+    </div>
+    <div class="info-box">
+      2023 — 2025 | Versão 1.0 |
+      <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
+    </div>
+  </footer>
+  <br><br>
+  <script src="../renderer/redefinir-senha_corrigido.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro - Escola de Aprendizes do Evangelho</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    img {
+      max-width: 100px;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    input {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #1e7e34;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .alert-box {
+      background-color: #ffdddd;
+      border: 1px solid #ff5c5c;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 10px;
+      color: #800000;
+      font-weight: bold;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .info-box {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo">
+  <h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
+
+  <form id="cadastroForm">
+    <input type="text" id="casaEspírita" placeholder="Nome da casa espírita" required />
+    <input type="text" id="numeroTurma" placeholder="Número da turma" required />
+    <input type="text" id="dirigente" placeholder="Nome do dirigente" required />
+    <input type="text" id="secretarios" placeholder="Nomes dos secretários" required />
+    <input type="text" id="aluno" placeholder="Nome do aluno" required />
+    <input type="email" id="email" placeholder="E-mail do aluno" required />
+
+    <div style="position: relative; display: flex; align-items: center;">
+      <input type="password" id="senha" placeholder="Senha da pasta de salvamento" required
+            style="flex: 1; padding-right: 2.5rem;" />
+      <button type="button" id="toggleSenha" title="Mostrar senha"
+              style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem;">
+        👁️
+      </button>
+    </div>
+
+    <ul id="senhaRegras" style="font-size: 0.85rem; text-align: left; list-style: none; padding-left: 0; color: #555; margin-top: 5px;">
+      <li id="regra-maiuscula" data-texto="Pelo menos 1 letra maiúscula">❌ Pelo menos 1 letra maiúscula</li>
+      <li id="regra-minuscula" data-texto="Pelo menos 1 letra minúscula">❌ Pelo menos 1 letra minúscula</li>
+      <li id="regra-numero" data-texto="Pelo menos 1 número">❌ Pelo menos 1 número</li>
+      <li id="regra-simbolo" data-texto="Pelo menos 1 símbolo">❌ Pelo menos 1 símbolo</li>
+      <li id="regra-tamanho" data-texto="Pelo menos 8 caracteres">❌ Pelo menos 8 caracteres</li>
+    </ul>
+
+    <input type="password" id="confirmarSenha" placeholder="Confirme a senha" required />
+    <div id="mensagem" style="font-weight: bold; color: #007700;"></div>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <footer>
+    <div class="alert-box">
+      Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
+    </div>
+    <div class="info-box">
+      2023 — 2025 | Versão 1.0 |
+      <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
+    </div>
+  </footer>
+  <br><br>
+
+  <script src="../renderer/cadastro.js"></script>
+</body>
+</html>
