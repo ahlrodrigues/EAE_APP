@@ -55,6 +55,16 @@
     button:hover {
       background: #005fa3;
     }
+    .mensagem {
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .mensagem.sucesso {
+      color: #007700;
+    }
+    .mensagem.erro {
+      color: #cc0000;
+    }
     footer {
       margin-top: 2rem;
       text-align: center;
@@ -82,11 +92,12 @@
   </style>
 </head>
 <body>
-  <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo">
+  <img src="../images/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
   <h1>Solicitar Redefinição de Senha</h1>
 
   <form id="solicitarTokenForm">
     <input type="email" id="email" placeholder="Digite seu e-mail" required />
+    <div id="mensagem" class="mensagem"></div>
     <button type="submit">Enviar token por e-mail</button>
   </form>
 
@@ -100,6 +111,26 @@
     </div>
   </footer>
   <br><br>
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('solicitarTokenForm');
+  const emailInput = document.getElementById('email');
+  const mensagemDiv = document.getElementById('mensagem');
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = emailInput.value.trim();
+
+    mensagemDiv.textContent = '';
+    mensagemDiv.classList.remove('sucesso', 'erro');
+
+    if (!email) {
+      mensagemDiv.textContent = '❌ Por favor, preencha o e-mail.';
+      mensagemDiv.classList.add('erro');
+      return;
+    }
+});
+  </script>
   <script src="../renderer/solicitar-token.js"></script>
 </body>
 </html>
