@@ -3,12 +3,18 @@ window.addEventListener('DOMContentLoaded', () => {
   const emailInput = document.getElementById('email');
   const mensagemDiv = document.getElementById('mensagem');
 
+  console.log("🔍 electronAPI:", window.electronAPI);
+
+  if (!window.electronAPI?.solicitarToken) {
+    console.error("❌ API solicitarToken não disponível no preload");
+    mensagemDiv.textContent = "Erro interno: API não carregada.";
+    mensagemDiv.classList.add('erro');
+    return;
+  }
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = emailInput.value.trim();
-
-    mensagemDiv.textContent = '';
-    mensagemDiv.classList.remove('sucesso', 'erro');
 
     if (!email) {
       mensagemDiv.textContent = '❌ Por favor, preencha o e-mail.';
@@ -18,16 +24,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
     try {
       const resposta = await window.electronAPI.solicitarToken(email);
-      if (resposta.sucesso) {
-        mensagemDiv.textContent = '✅ Token enviado com sucesso! Redirecionando...';
+      console.log("📦 Resposta:", resposta);
+
+      if (resposta?.sucesso) {
+        mensagemDiv.textContent = '✅ Token enviado com sucesso!';
         mensagemDiv.classList.add('sucesso');
-        setTimeout(() => window.location.href = 'recuperar-senha.html', 1500);
+        // 🔁 Redirecionar após pequeno atraso para o usuário ver a mensagem
+  setTimeout(() => {
+    window.location.href = "redefinir-senha.html";
+  }, 2000);
       } else {
-        mensagemDiv.textContent = `❌ Erro: ${resposta.erro || 'Não foi possível enviar o token.'}`;
+        mensagemDiv.textContent = '❌ ' + (resposta?.erro || 'Erro ao enviar token.');
         mensagemDiv.classList.add('erro');
       }
     } catch (erro) {
-      mensagemDiv.textContent = `⚠️ Erro ao solicitar token: ${erro.message}`;
+      console.error('Erro ao solicitar token:', erro);
+      mensagemDiv.textContent = '❌ Erro inesperado.';
       mensagemDiv.classList.add('erro');
     }
   });

@@ -120,16 +120,34 @@
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = emailInput.value.trim();
-
+  
     mensagemDiv.textContent = '';
     mensagemDiv.classList.remove('sucesso', 'erro');
-
+  
     if (!email) {
       mensagemDiv.textContent = '❌ Por favor, preencha o e-mail.';
       mensagemDiv.classList.add('erro');
       return;
     }
+  
+    try {
+      const resposta = await window.electronAPI.solicitarToken(email);
+  
+      if (resposta?.sucesso) {
+        mensagemDiv.textContent = '✅ Token enviado com sucesso!';
+        mensagemDiv.classList.add('sucesso');
+      } else {
+        mensagemDiv.textContent = '❌ ' + (resposta?.erro || 'Erro ao enviar token.');
+        mensagemDiv.classList.add('erro');
+      }
+    } catch (erro) {
+      console.error('Erro ao solicitar token:', erro);
+      mensagemDiv.textContent = '❌ Erro inesperado. Veja o console.';
+      mensagemDiv.classList.add('erro');
+    }
+  });
 });
+  
   </script>
   <script src="../renderer/solicitar-token.js"></script>
 </body>

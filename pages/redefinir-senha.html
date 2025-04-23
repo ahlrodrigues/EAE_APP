@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Redefinir Senha</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Redefinir Senha</title>
+<style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -83,26 +84,52 @@
   </style>
 </head>
 <body>
-  <img src="../images/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
-  <h1>Redefinir Senha</h1>
+<img alt="Logo Trevo" src="../images/trevo.png" style="max-width: 200px; margin-bottom: 1rem;"/>
+<h1>Redefinir Senha</h1>
+<form id="redefinirSenhaForm">
+<input id="token" placeholder="Digite o token" required="" type="text"/>
+<input id="novaSenha" placeholder="Nova senha" required="" type="password"/>
+<div id="validacoesSenha" style="text-align: left; font-size: 0.9rem; margin-top: -0.5rem;">
+<p id="comprimento" style="margin: 0;">❌ Mínimo 8 caracteres</p>
+<p id="maiuscula" style="margin: 0;">❌ Letra maiúscula</p>
+<p id="minuscula" style="margin: 0;">❌ Letra minúscula</p>
+<p id="numero" style="margin: 0;">❌ Número</p>
+<p id="simbolo" style="margin: 0;">❌ Símbolo</p>
+</div>
 
-  <form id="redefinirSenhaForm">
-    <input type="text" id="token" placeholder="Digite o token" required />
-    <input type="password" id="novaSenha" placeholder="Nova senha" required />
-    <input type="password" id="confirmarSenha" placeholder="Confirme a nova senha" required />
-    <button type="submit">Redefinir senha</button>
-  </form>
-
-  <footer>
-    <div class="alert-box">
+<input id="confirmarSenha" placeholder="Confirme a nova senha" required="" type="password"/>
+<button type="submit">Redefinir senha</button>
+</form>
+<footer>
+<div class="alert-box">
       Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
     </div>
-    <div class="info-box">
+<div class="info-box">
       2023 — 2025 | Versão 1.0 |
       <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
-    </div>
-  </footer>
-  <br><br>
-  <script src="../renderer/redefinir-senha_corrigido.js"></script>
-</body>
+</div>
+</footer>
+<br/><br/>
+<script src="../renderer/redefinir-senha.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const senhaInput = document.getElementById("novaSenha");
+  const comprimento = document.getElementById("comprimento");
+  const maiuscula = document.getElementById("maiuscula");
+  const minuscula = document.getElementById("minuscula");
+  const numero = document.getElementById("numero");
+  const simbolo = document.getElementById("simbolo");
+
+  senhaInput.addEventListener("input", () => {
+    const senha = senhaInput.value;
+
+    // Validação dinâmica
+    comprimento.textContent = senha.length >= 8 ? "✔️ Mínimo 8 caracteres" : "❌ Mínimo 8 caracteres";
+    maiuscula.textContent = /[A-Z]/.test(senha) ? "✔️ Letra maiúscula" : "❌ Letra maiúscula";
+    minuscula.textContent = /[a-z]/.test(senha) ? "✔️ Letra minúscula" : "❌ Letra minúscula";
+    numero.textContent = /[0-9]/.test(senha) ? "✔️ Número" : "❌ Número";
+    simbolo.textContent = /[^A-Za-z0-9]/.test(senha) ? "✔️ Símbolo" : "❌ Símbolo";
+  });
+});
+</script></body>
 </html>

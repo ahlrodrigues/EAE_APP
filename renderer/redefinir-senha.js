@@ -1,39 +1,48 @@
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    document.querySelectorAll('input').forEach(input => {
-      input.removeAttribute('readonly');
-      input.removeAttribute('disabled');
-      input.style.pointerEvents = 'auto';
-      input.style.userSelect = 'auto';
-      input.style.backgroundColor = '#fff';
-    });
-  }, 100); // espera o render concluir
-});
+  const form = document.getElementById("redefinirSenhaForm");
 
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-document.getElementById('redefinirSenhaForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+    const tokenInput = document.getElementById("token");
+    const novaSenhaInput = document.getElementById("novaSenha");
+    const confirmarSenhaInput = document.getElementById("confirmarSenha");
 
-  const token = document.getElementById('token').value.trim();
-  const novaSenha = document.getElementById('novaSenha').value;
-  const confirmarSenha = document.getElementById('confirmarSenha').value;
+    const token = tokenInput?.value.trim() || "";
+    const novaSenha = novaSenhaInput?.value || "";
+    const confirmarSenha = confirmarSenhaInput?.value || "";
 
-  if (novaSenha !== confirmarSenha) {
-    alert('As senhas não coincidem.');
-    return;
-  }
+    if (!token || !novaSenha || !confirmarSenha) {
+      alert("Preencha todos os campos.");
+      return;
+    }
 
-  if (!window.api || typeof window.api.redefinirSenha !== 'function') {
-    alert('❌ API de redefinição não disponível.');
-    return;
-  }
+    // 🔐 Validação de senha igual à do cadastro
+    const senhaForteRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-  const resposta = await window.api.redefinirSenha({ token, novaSenha });
+    if (!senhaForteRegex.test(novaSenha)) {
+      alert("A senha deve conter ao menos 8 caracteres, incluindo letra maiúscula, minúscula, número e símbolo.");
+      return;
+    }
 
-  if (resposta.sucesso) {
-    alert('Senha redefinida com sucesso!');
-    window.location.href = 'login.html';
-  } else {
-    alert('Erro ao redefinir senha: ' + resposta.erro);
-  }
+    if (novaSenha !== confirmarSenha) {
+      alert("As senhas não coincidem.");
+      return;
+    }
+
+    try {
+      const resposta = await window.electronAPI.redefinirSenha(token, novaSenha);
+      console.log("📦 Resposta recebida:", resposta);
+
+      if (resposta?.sucesso) {
+        alert("✅ Senha redefinida com sucesso!");
+        window.location.href = "login.html";
+      } else {
+        alert("❌ Erro: " + (resposta?.erro || "Não foi possível redefinir a senha."));
+      }
+    } catch (erro) {
+      console.error("Erro ao redefinir senha:", erro);
+      alert("❌ Erro inesperado. Veja o console.");
+    }
+  });
 });

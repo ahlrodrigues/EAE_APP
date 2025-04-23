@@ -20,6 +20,8 @@ function createWindow() {
   mainWindow.maximize();
   mainWindow.show();
   mainWindow.loadFile('pages/login.html');
+  mainWindow.webContents.openDevTools(); // Apenas para debug temporário
+
 }
 
 app.whenReady().then(() => {
@@ -36,20 +38,51 @@ app.on('window-all-closed', () => {
 
 const configPath = path.join(app.getPath('userData'), 'config');
 const filePath = path.join(configPath, 'usuario.json');
+const arquivoUsuario = path.join(configPath, "usuario.json");
 
-ipcMain.handle('salvar-dados-cadastro', async (event, dados) => {
+
+// 🛠️ Cria a pasta config se ela não existir
+if (!fs.existsSync(configPath)) {
+  fs.mkdirSync(configPath, { recursive: true });
+}
+
+ipcMain.handle("salvar-dados-cadastro", async (event, dadosRecebidos) => {
   try {
+    const userDataPath = app.getPath("userData");
+    const configPath = path.join(userDataPath, "config");
+
     if (!fs.existsSync(configPath)) {
       fs.mkdirSync(configPath, { recursive: true });
     }
-    const senhaCriptografada = await bcrypt.hash(dados.senha, 10);
-    const dadosASalvar = { ...dados, senha: senhaCriptografada };
-    fs.writeFileSync(filePath, JSON.stringify(dadosASalvar, null, 2), 'utf-8');
+
+    const arquivoUsuario = path.join(configPath, "usuario.json");
+
+    // 🔐 Criptografar a senha recebida
+    const bcrypt = require("bcryptjs");
+    const senhaCriptografada = bcrypt.hashSync(dadosRecebidos.senha, 10);
+
+    // ✅ Declarar a variável 'dados' corretamente
+    const dados = {
+      casaEspírita: dadosRecebidos.casaEspírita,
+      numeroTurma: dadosRecebidos.numeroTurma,
+      dirigente: dadosRecebidos.dirigente,
+      secretarios: dadosRecebidos.secretarios,
+      aluno: dadosRecebidos.aluno,
+      email: dadosRecebidos.email,
+      senha: senhaCriptografada
+      // confirmarSenha não incluído
+    };
+
+    fs.writeFileSync(arquivoUsuario, JSON.stringify(dados, null, 2));
+
     return { sucesso: true };
   } catch (erro) {
-    return { sucesso: false, erro: erro.message };
+    console.error("❌ Erro ao salvar cadastro:", erro);
+    return { sucesso: false, erro: "Erro ao salvar os dados." };
   }
 });
+
+
 
 ipcMain.handle('fazer-login', async (event, email, senha) => {
   try {
@@ -70,16 +103,37 @@ ipcMain.handle('fazer-login', async (event, email, senha) => {
   }
 });
 
-ipcMain.handle('solicitar-token', async (event, email) => {
-  const token = crypto.randomBytes(4).toString('hex');
+const userDataPath = app.getPath("userData");
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS
+ipcMain.handle("solicitar-token", async (event, email) => {
+  try {
+    const filePath = path.join(userDataPath, "config", "usuario.json");
+
+    if (!fs.existsSync(filePath)) {
+      return { sucesso: false, erro: "Usuário não encontrado." };
     }
-  });
+
+    const dados = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    if (dados.email !== email) {
+      return { sucesso: false, erro: "E-mail não cadastrado." };
+    }
+
+    const token = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiracao = Date.now() + 1000 * 60 * 10; // 10 minutos
+
+    dados.tokenRedefinicao = token;
+    dados.expiracaoToken = expiracao;
+
+    fs.writeFileSync(filePath, JSON.stringify(dados, null, 2));
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
 
   const mailOptions = {
     from: `"Escola de Aprendizes" <${process.env.GMAIL_USER}>`,
@@ -104,14 +158,63 @@ ipcMain.handle('solicitar-token', async (event, email) => {
 
   };
 
+  await transporter.sendMail(mailOptions);
+
+  return { sucesso: true };
+} catch (erro) {
+  console.error("Erro ao enviar token:", erro);
+  return { sucesso: false, erro: "Erro ao enviar o token." };
+}
+});
+
+ipcMain.handle("redefinir-senha", async (event, token, novaSenha) => {
+  console.log("🛠️ Redefinição de senha iniciada");
+  console.log("📨 Token recebido:", token);
+  console.log("🔐 Nova senha recebida:", novaSenha);
+
   try {
-    await transporter.sendMail(mailOptions);
-    return { sucesso: true, token };
+    const configPath = path.join(userDataPath, "config", "usuario.json");
+    console.log("📁 Caminho do arquivo JSON:", configPath);
+
+    if (!fs.existsSync(configPath)) {
+      console.warn("❌ Arquivo usuario.json não encontrado.");
+      return { sucesso: false, erro: "Arquivo de usuário não encontrado." };
+    }
+
+    const conteudo = fs.readFileSync(configPath, "utf-8");
+    console.log("📄 Conteúdo carregado:", conteudo);
+
+    const dados = JSON.parse(conteudo);
+    console.log("🧠 JSON analisado:", dados);
+
+    if (!dados.tokenRedefinicao) {
+      console.warn("❌ Campo 'tokenRedefinicao' ausente.");
+      return { sucesso: false, erro: "Token não solicitado." };
+    }
+
+    if (dados.tokenRedefinicao !== token) {
+      console.warn("❌ Token inválido.");
+      return { sucesso: false, erro: "Token inválido ou expirado." };
+    }
+
+    if (Date.now() > dados.expiracaoToken) {
+      console.warn("⚠️ Token expirado.");
+      return { sucesso: false, erro: "Token expirado." };
+    }
+
+    const senhaCriptografada = bcrypt.hashSync(novaSenha, 10);
+    dados.senha = senhaCriptografada;
+
+    delete dados.tokenRedefinicao;
+    delete dados.expiracaoToken;
+
+    fs.writeFileSync(configPath, JSON.stringify(dados, null, 2));
+    console.log("✅ Senha redefinida e arquivo salvo.");
+
+    return { sucesso: true };
   } catch (erro) {
-    return { sucesso: false, erro: erro.message };
+    console.error("❌ Erro ao redefinir senha:", erro);
+    return { sucesso: false, erro: "Erro interno ao redefinir a senha." };
   }
 });
 
-ipcMain.handle('redefinir-senha', async (event, token, novaSenha) => {
-  return { sucesso: true }; // implementação futura
-});
