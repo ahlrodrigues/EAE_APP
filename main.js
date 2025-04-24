@@ -1,11 +1,11 @@
 require('dotenv').config();
-
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const os = require("os");
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -13,6 +13,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
+      enableRemoteModule: false,
       nodeIntegration: false
     }
   });
@@ -82,6 +83,39 @@ ipcMain.handle("salvar-dados-cadastro", async (event, dadosRecebidos) => {
   }
 });
 
+ipcMain.handle("obter-nome-aluno", async () => {
+  try {
+    const userDataPath = path.join(os.homedir(), ".config", "escola-aprendizes-final");
+    const configPath = path.join(userDataPath, "config", "usuario.json");
+
+    if (!fs.existsSync(configPath)) return null;
+
+    const conteudo = fs.readFileSync(configPath, "utf-8");
+    const dados = JSON.parse(conteudo);
+
+    return dados.aluno || null;
+  } catch {
+    return null;
+  }
+});
+
+ipcMain.handle("salvar-nota", async (event, { titulo, conteudo }) => {
+  try {
+    const dirNotas = path.join(os.homedir(), '.config', 'escola-aprendizes-final', 'notas');
+    if (!fs.existsSync(dirNotas)) {
+      fs.mkdirSync(dirNotas, { recursive: true });
+    }
+
+    const nomeArquivo = `${titulo.replace(/\s+/g, '_')}_${Date.now()}.txt`;
+    const caminho = path.join(dirNotas, nomeArquivo);
+
+    fs.writeFileSync(caminho, conteudo, 'utf-8');
+
+    return { sucesso: true };
+  } catch (erro) {
+    return { sucesso: false, erro: erro.message };
+  }
+});
 
 
 ipcMain.handle('fazer-login', async (event, email, senha) => {
@@ -102,6 +136,7 @@ ipcMain.handle('fazer-login', async (event, email, senha) => {
     return { sucesso: false, erro: erro.message };
   }
 });
+
 
 const userDataPath = app.getPath("userData");
 
@@ -166,6 +201,38 @@ ipcMain.handle("solicitar-token", async (event, email) => {
   return { sucesso: false, erro: "Erro ao enviar o token." };
 }
 });
+
+function encrypt(text) {
+  const ENCRYPTION_KEY = process.env.CRYPTO_SECRET.padEnd(32, "0"); // 32 bytes
+  const IV = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(ENCRYPTION_KEY), IV);
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return IV.toString("hex") + ":" + encrypted;
+}
+
+ipcMain.handle("salvar-nota-criptografada", async (event, { nomeArquivo, conteudo }) => {
+  try {
+    const dirNotas = path.join(os.homedir(), ".config", "escola-aprendizes-final", "notas");
+    if (!fs.existsSync(dirNotas)) {
+      fs.mkdirSync(dirNotas, { recursive: true });
+    }
+
+    if (!nomeArquivo || !conteudo) {
+      throw new Error("Dados inválidos.");
+    }
+
+    const caminho = path.join(dirNotas, nomeArquivo);
+    const criptografado = encrypt(conteudo);
+    fs.writeFileSync(caminho, criptografado, "utf-8");
+
+    return { sucesso: true };
+  } catch (erro) {
+    return { sucesso: false, erro: erro.message };
+  }
+});
+
+
 
 ipcMain.handle("redefinir-senha", async (event, token, novaSenha) => {
   console.log("🛠️ Redefinição de senha iniciada");

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notas - Escola de Aprendizes do Evangelho</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    img {
+      max-width: 100px;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    input, textarea {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background: #0077cc;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+    .alert-box {
+      background-color: #ffdddd;
+      border: 1px solid #ff5c5c;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 10px;
+      color: #800000;
+      font-weight: bold;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <img src="../images/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
+  <h1>Registro de Notas</h1>
+
+  <form id="notaForm">
+    <input type="date" id="data" required />
+    <textarea id="fato" placeholder="Fato" required></textarea>
+    <textarea id="reacao" placeholder="Reação" required></textarea>
+    <textarea id="sentimento" placeholder="Sentimento relacionado" required></textarea>
+    <textarea id="proposta" placeholder="Proposta renovadora" required></textarea>
+    <button type="submit">Salvar Nota</button>
+  </form>
+
+  <footer>
+    <div class="alert-box">
+      Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
+    </div>
+  </footer>
+
+  <script src="../renderer/notas.js"></script>
+</body>
+</html>
