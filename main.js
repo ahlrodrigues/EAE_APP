@@ -1,8 +1,3 @@
-// main.js — versão final com criptografia de todos os dados do usuario.json
-console.log("✅ main.js correto carregado em", new Date().toLocaleString());
-
-// main.js — versão final com criptografia de todos os dados do usuario.json
-
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -22,6 +17,59 @@ function criptografarCampo(texto, chave) {
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return `${iv.toString("base64")}:${encrypted.toString("base64")}`;
 }
+
+function descriptografarCampo(textoCriptografado, chave) {
+  const [ivBase64, conteudoBase64] = textoCriptografado.split(":");
+  const iv = Buffer.from(ivBase64, "base64");
+  const encryptedText = Buffer.from(conteudoBase64, "base64");
+  const key = crypto.createHash("sha256").update(chave).digest();
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString("utf8");
+}
+
+ipcMain.handle("ler-usuario", async () => {
+  try {
+    if (!global.senhaDescriptografia) {
+      console.warn("⚠️ Senha não disponível em memória.");
+      throw new Error("Senha não está disponível em memória.");
+    }
+
+    if (!fs.existsSync(usuarioPath)) {
+      console.warn("⚠️ usuario.json não encontrado.");
+      return null;
+    }
+
+    const raw = fs.readFileSync(usuarioPath, "utf-8");
+    const dadosCriptografados = JSON.parse(raw);
+
+    const usuario = {
+      casaEspírita: descriptografarCampo(dadosCriptografados.casaEspírita, global.senhaDescriptografia),
+      numeroTurma: descriptografarCampo(dadosCriptografados.numeroTurma, global.senhaDescriptografia),
+      dirigente: descriptografarCampo(dadosCriptografados.dirigente, global.senhaDescriptografia),
+      secretarios: descriptografarCampo(dadosCriptografados.secretarios, global.senhaDescriptografia),
+      aluno: descriptografarCampo(dadosCriptografados.aluno, global.senhaDescriptografia),
+      email: descriptografarCampo(dadosCriptografados.email, global.senhaDescriptografia),
+      senha: dadosCriptografados.senha
+    };
+
+    return usuario;
+  } catch (err) {
+    console.error("❌ Erro ao descriptografar usuario.json:", err.message);
+    return null;
+  }
+});
+
+ipcMain.handle("validar-senha-hash", async (event, senhaDigitada, hashSalvo) => {
+  try {
+    return bcrypt.compareSync(senhaDigitada, hashSalvo);
+  } catch (err) {
+    console.error("Erro ao validar hash da senha:", err);
+    return false;
+  }
+});
+
 
 ipcMain.handle("salvar-cadastro", async (event, dados) => {
   try {
@@ -80,6 +128,29 @@ ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
     return "Erro ao carregar nota.";
   }
 });
+
+ipcMain.handle("salvar-nota", async (event, nomeArquivo, conteudo) => {
+  try {
+    if (!global.senhaDescriptografia) {
+      throw new Error("Senha não disponível.");
+    }
+
+    const iv = crypto.randomBytes(16);
+    const key = crypto.createHash("sha256").update(global.senhaDescriptografia).digest();
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+    let encrypted = cipher.update(conteudo, "utf8");
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    const finalContent = `${iv.toString("base64")}:${encrypted.toString("base64")}`;
+
+    const filePath = path.join(notasPath, nomeArquivo);
+    fs.writeFileSync(filePath, finalContent, "utf-8");
+    return true;
+  } catch (err) {
+    console.error("Erro ao salvar nota criptografada:", err);
+    return false;
+  }
+});
+
 
 function descriptografarNota(textoCriptografado, senha) {
   try {

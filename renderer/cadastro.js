@@ -100,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sucesso = await window.electronAPI.salvarCadastro(dados);
         if (sucesso) {
           alert("Cadastro salvo com sucesso!");
+          window.location.href = "login.html";
           form.reset();
         } else {
           alert("Erro ao salvar cadastro.");
