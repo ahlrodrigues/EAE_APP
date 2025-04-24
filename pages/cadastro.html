@@ -82,7 +82,7 @@
   </style>
 </head>
 <body>
- <img src="../images/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
+ <img src="../assets/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
   <h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
 
   <form id="cadastroForm">
@@ -110,7 +110,9 @@
       <li id="regra-tamanho" data-texto="Pelo menos 8 caracteres">❌ Pelo menos 8 caracteres</li>
     </ul>
 
-    <input type="password" id="confirmarSenha" placeholder="Confirme a senha" required />
+    <div style="position: relative; display: flex; align-items: center;">
+      <input type="password" id="confirmarSenha" placeholder="Confirme a senha" required style="flex: 1; padding-right: 2.5rem;" />
+    </div>
     <div id="mensagem" style="font-weight: bold; color: #007700;"></div>
     <button type="submit">Salvar</button>
   </form>

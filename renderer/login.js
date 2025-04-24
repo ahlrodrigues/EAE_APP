@@ -14,6 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const resposta = await window.electronAPI.fazerLogin(email, senha);
       if (resposta.sucesso) {
         window.location.href = 'index.html';
+        await window.electronAPI.armazenarSenha(senhaDigitada);
       } else {
         mensagemDiv.textContent = '❌ Login inválido. Tente novamente.';
       }

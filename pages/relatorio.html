@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Relatório de Notas - Escola de Aprendizes do Evangelho</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    img {
+      max-width: 100px;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+      max-width: 700px;
+    }
+    li {
+      background: white;
+      margin: 0.5rem 0;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e7e34;
+    }
+    pre {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      white-space: pre-wrap;
+      text-align: left;
+      margin-top: 2rem;
+      max-width: 700px;
+      overflow-x: auto;
+    }
+    footer {
+      margin-top: 3rem;
+    }
+    .alert-box {
+      background-color: #ffdddd;
+      border: 1px solid #ff5c5c;
+      border-radius: 10px;
+      padding: 1rem;
+      color: #800000;
+      font-weight: bold;
+    }
+    .info-box {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo">
+  <h1>RELATÓRIO DE NOTAS</h1>
+
+  <ul id="listaNotas"></ul>
+  <pre id="conteudoNota"></pre>
+
+  <footer>
+    <div class="alert-box">
+      Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
+    </div>
+    <div class="info-box">
+      2023 — 2025 | Versão 1.0 |
+      <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
+    </div>
+  </footer>
+
+  <script>
+    window.electronAPI.listarNotas().then(notas => {
+      const lista = document.getElementById("listaNotas");
+      notas.forEach(nota => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>${nota}</span>
+          <button onclick="abrirNota('${nota}')">Ver conteúdo</button>
+        `;
+        lista.appendChild(li);
+      });
+    });
+
+    function abrirNota(nome) {
+      window.electronAPI.lerNota(nome).then(conteudo => {
+        document.getElementById("conteudoNota").textContent = conteudo;
+      });
+    }
+  </script>
+</body>
+</html>

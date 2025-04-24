@@ -1,10 +1,10 @@
-const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  fazerLogin: (email, senha) => ipcRenderer.invoke('fazer-login', email, senha),
-  salvarCadastro: (dados) => ipcRenderer.invoke('salvar-dados-cadastro', dados),
-  solicitarToken: (email) => ipcRenderer.invoke('solicitar-token', email),
-  redefinirSenha: (token, novaSenha) => ipcRenderer.invoke('redefinir-senha', token, novaSenha),
-  salvarNota: (dados) => ipcRenderer.invoke("salvar-nota-criptografada", dados),
-  obterNomeAluno: () => ipcRenderer.invoke("obter-nome-aluno")
-  });
+const { contextBridge, ipcRenderer } = require("electron");
+
+contextBridge.exposeInMainWorld("electronAPI", {
+  salvarCadastro: (dados) => ipcRenderer.invoke("salvar-cadastro", dados),
+  armazenarSenha: (senha) => ipcRenderer.invoke("armazenar-senha", senha),
+  listarNotas: () => ipcRenderer.invoke("listar-notas"),
+  lerNota: (nome) => ipcRenderer.invoke("ler-nota", nome),
+  redefinirSenha: (tokenOuAntiga, novaSenha) => ipcRenderer.invoke("redefinir-senha", tokenOuAntiga, novaSenha)
+});
