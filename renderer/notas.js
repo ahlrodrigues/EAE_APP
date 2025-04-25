@@ -44,18 +44,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Erro ao carregar lista de notas:", e);
   }
 
+  window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const multi = urlParams.get("multi");
+  
+    if (multi === "true") {
+      const lista = JSON.parse(localStorage.getItem("notasSelecionadas"));
+      if (!lista || !Array.isArray(lista)) return;
+  
+      document.getElementById("tituloNota").textContent = "Notas Selecionadas";
+      const bloco = lista.map(n => `<h3>${n.nome}</h3><pre>${n.conteudo}</pre><hr>`).join("");
+      document.getElementById("conteudoNota").innerHTML = bloco;
+    } else {
+      const dados = JSON.parse(localStorage.getItem("notaSelecionada"));
+      if (!dados) {
+        document.getElementById("conteudoNota").textContent = "Erro: nota não encontrada.";
+        return;
+      }
+      document.getElementById("tituloNota").textContent = `Arquivo: ${dados.nome}`;
+      document.getElementById("conteudoNota").textContent = dados.conteudo;
+    }
+  };
+  
+
   // Salvar nova nota
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = document.getElementById("data").value;
+    const dataBr = data.split('-').reverse().join('-'); // converte para DD-MM-YYYY
     const fato = document.getElementById("fato").value;
     const reacao = document.getElementById("reacao").value;
     const sentimento = document.getElementById("sentimento").value;
     const proposta = document.getElementById("proposta").value;
+    const nota = `Data: ${dataBr}\nFato: ${fato}\nReação: ${reacao}\nSentimento: ${sentimento}\nProposta: ${proposta}`;
 
-    const nota = `Data: ${data}\nFato: ${fato}\nReação: ${reacao}\nSentimento: ${sentimento}\nProposta: ${proposta}`;
+
     const agora = new Date();
-    const nomeArquivo = `${agora.toISOString().replace(/[:.]/g, "_").slice(0, 19)}-${nomeAluno}_${numeroTurma}.txt`;
+    const dataFormatada = agora.toLocaleDateString("sv-SE"); // yyyy-mm-dd
+    const horaFormatada = agora.toLocaleTimeString("it-IT").replace(/:/g, "_"); // hh_mm_ss
+    const nomeArquivo = `${dataFormatada}_${horaFormatada}-${nomeAluno}_${numeroTurma}.txt`;
 
     try {
       const sucesso = await window.electronAPI.salvarNota(nomeArquivo, nota);

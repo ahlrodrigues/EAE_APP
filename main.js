@@ -29,6 +29,18 @@ function descriptografarCampo(textoCriptografado, chave) {
   return decrypted.toString("utf8");
 }
 
+ipcMain.handle("excluir-nota", async (event, nomeArquivo) => {
+  try {
+    const filePath = path.join(notasPath, nomeArquivo);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    return true;
+  } catch (err) {
+    console.error("Erro ao excluir nota:", err);
+    return false;
+  }
+});
+
+
 ipcMain.handle("ler-usuario", async () => {
   try {
     if (!global.senhaDescriptografia) {
@@ -106,6 +118,7 @@ ipcMain.handle("armazenar-senha", async (event, senhaPura) => {
 });
 
 ipcMain.handle("listar-notas", async () => {
+  const notasPath = path.join(app.getPath("home"), ".config", "escola-aprendizes-final", "notas");
   try {
     if (!fs.existsSync(notasPath)) return [];
     return fs.readdirSync(notasPath).filter(nome => nome.endsWith(".txt"));
@@ -114,6 +127,7 @@ ipcMain.handle("listar-notas", async () => {
     return [];
   }
 });
+
 
 ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
   try {

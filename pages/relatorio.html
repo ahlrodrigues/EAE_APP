@@ -1,126 +1,301 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório de Notas - Escola de Aprendizes do Evangelho</title>
+  <meta charset="UTF-8" />
+  <title>Relatório de Notas</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      text-align: center;
-      padding: 2rem;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
     }
-    img {
-      max-width: 100px;
-      margin-top: 1rem;
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      margin-top: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    header {
+      text-align: center;
       margin-bottom: 1rem;
     }
-    h1 {
-      margin-bottom: 2rem;
+
+    header img {
+      max-width: 100px;
+      margin-bottom: 1rem;
     }
-    ul {
-      list-style: none;
-      padding: 0;
+
+    header h1 {
+      margin: 0;
+      color: #333;
+    }
+
+    table {
       width: 100%;
-      max-width: 700px;
+      border-collapse: collapse;
+      margin-top: 1rem;
     }
-    li {
-      background: white;
-      margin: 0.5rem 0;
+
+    th, td {
       padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
+
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
     button {
       padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #28a745;
+      background-color: #0077cc;
       color: white;
-      font-weight: bold;
-      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
     }
+
     button:hover {
-      background: #1e7e34;
+      background-color: #005fa3;
     }
-    pre {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      white-space: pre-wrap;
-      text-align: left;
-      margin-top: 2rem;
-      max-width: 700px;
-      overflow-x: auto;
+
+    .acoes-multiplas {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
     }
+
     footer {
-      margin-top: 3rem;
-    }
-    .alert-box {
-      background-color: #ffdddd;
-      border: 1px solid #ff5c5c;
-      border-radius: 10px;
+      text-align: center;
+      margin-top: 2rem;
       padding: 1rem;
-      color: #800000;
-      font-weight: bold;
-    }
-    .info-box {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #555;
     }
-    a {
-      color: #0066cc;
-      text-decoration: none;
+
+    .filtro {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .filtro input[type="date"] {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
-  <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo">
-  <h1>RELATÓRIO DE NOTAS</h1>
+  <div class="container">
+    <header>
+      <img src="../assets/trevo.png" alt="Logo Trevo" />
+      <h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
+    </header>
 
-  <ul id="listaNotas"></ul>
-  <pre id="conteudoNota"></pre>
+    <div class="filtro">
+      <label for="dataInicio">De:</label><input type="date" id="dataInicio" />
+      <label for="dataFim">Até:</label><input type="date" id="dataFim" />
+    </div>
+
+    <div class="acoes-multiplas">
+      <button id="btnVisualizarSelecionados">Ver Selecionadas</button>
+      <button id="btnExportarSelecionados">Exportar</button>
+      <button id="btnImprimirSelecionados">Imprimir</button>
+      <button id="btnExcluirSelecionados">Excluir</button>
+    </div>
+
+    <table id="tabelaNotas">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selecionarTodos" /></th>
+          <th>#</th>
+          <th>Data</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JavaScript irá preencher -->
+      </tbody>
+    </table>
+  </div>
 
   <footer>
-    <div class="alert-box">
-      Este site não armazena nenhuma informação. Todas as informações geradas são salvas localmente no computador do usuário.
-    </div>
-    <div class="info-box">
-      2023 — 2025 | Versão 1.0 |
-      <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
-    </div>
+    Relatório local — Escola de Aprendizes do Evangelho — 2025
   </footer>
 
   <script>
-    window.electronAPI.listarNotas().then(notas => {
-      const lista = document.getElementById("listaNotas");
-      notas.forEach(nota => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span>${nota}</span>
-          <button onclick="abrirNota('${nota}')">Ver conteúdo</button>
-        `;
-        lista.appendChild(li);
-      });
-    });
+    window.addEventListener("DOMContentLoaded", async () => {
+      const tabela = document.querySelector("#tabelaNotas tbody");
+      const filtro = document.getElementById("filtroData");
+      const chkTodos = document.getElementById("selecionarTodos");
 
-    function abrirNota(nome) {
-      window.electronAPI.lerNota(nome).then(conteudo => {
-        document.getElementById("conteudoNota").textContent = conteudo;
+      const arquivos = await window.electronAPI.listarNotas();
+
+      function formatarData(isoString) {
+        const partes = isoString.split("T")[0];
+        const [ano, mes, dia] = partes.split("-");
+        return `${dia}/${mes}/${ano}`;
+      }
+
+      function renderTabela(lista) {
+        tabela.innerHTML = "";
+        lista.forEach((nome, index) => {
+          const tr = document.createElement("tr");
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "linha-selecao";
+          checkbox.dataset.nome = nome;
+
+          const tdCheckbox = document.createElement("td");
+          tdCheckbox.appendChild(checkbox);
+
+          const tdIndex = document.createElement("td");
+          tdIndex.textContent = index + 1;
+
+          const dataArquivo = nome.split("T")[0];
+          const tdData = document.createElement("td");
+          tdData.textContent = formatarData(dataArquivo);
+
+          const tdAcao = document.createElement("td");
+          const btnVer = document.createElement("button");
+          
+          btnVer.textContent = "Ver nota";
+          
+          btnVer.onclick = async () => {
+            const conteudo = await window.electronAPI.lerNota(nome);
+          
+            // Novo: separar a data do nome do arquivo
+            const partes = nome.split("T")[0].split("-");
+            const dataFormatada = `${partes[2].padStart(2, "0")}-${partes[1].padStart(2, "0")}-${partes[0]}`;
+          
+            // Salva no formato novo
+            localStorage.setItem("notaSelecionada", JSON.stringify({ data: dataFormatada, conteudo }));
+          
+            window.open("nota.html", "_blank");
+          };
+        
+          
+
+          tdAcao.appendChild(btnVer);
+          tr.appendChild(tdCheckbox);
+          tr.appendChild(tdIndex);
+          tr.appendChild(tdData);
+          tr.appendChild(tdAcao);
+          tabela.appendChild(tr);
+        });
+      }
+
+      renderTabela(arquivos);
+
+      document.getElementById("dataInicio").addEventListener("input", filtrarNotas);
+      document.getElementById("dataFim").addEventListener("input", filtrarNotas);
+
+      function filtrarNotas() {
+        const inicio = document.getElementById("dataInicio").value;
+        const fim = document.getElementById("dataFim").value;
+        const filtrados = arquivos.filter(nome => {
+          const dataArquivo = nome.split("T")[0];
+          return (!inicio || dataArquivo >= inicio) && (!fim || dataArquivo <= fim);
+        });
+        renderTabela(filtrados);
+      }
+
+      chkTodos.addEventListener("change", () => {
+        const todos = tabela.querySelectorAll(".linha-selecao");
+        todos.forEach(c => (c.checked = chkTodos.checked));
       });
-    }
+
+      document.getElementById("btnVisualizarSelecionados").onclick = async () => {
+        const selecionados = Array.from(document.querySelectorAll(".linha-selecao:checked"));
+        if (selecionados.length === 0) return alert("Nenhuma nota selecionada.");
+        let textoFinal = "";
+        for (const chk of selecionados) {
+          const conteudo = await window.electronAPI.lerNota(chk.dataset.nome);
+          textoFinal += `📄 ${chk.dataset.nome}\n\n${conteudo}\n\n===================\n\n`;
+        }
+        alert(textoFinal);
+      };
+
+      document.getElementById("btnExportarSelecionados").onclick = async () => {
+        const selecionados = Array.from(document.querySelectorAll(".linha-selecao:checked"));
+        if (selecionados.length === 0) return alert("Nenhuma nota selecionada.");
+        let textoFinal = "";
+        for (const chk of selecionados) {
+          const conteudo = await window.electronAPI.lerNota(chk.dataset.nome);
+          textoFinal += `📄 ${chk.dataset.nome}\n\n${conteudo}\n\n===================\n\n`;
+        }
+        const blob = new Blob([textoFinal], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "relatorio_selecionadas.txt";
+        a.click();
+      };
+
+      document.getElementById("btnImprimirSelecionados").onclick = async () => {
+        const selecionados = Array.from(document.querySelectorAll(".linha-selecao:checked"));
+        if (selecionados.length === 0) return alert("Nenhuma nota selecionada.");
+        let blocos = "";
+        for (const chk of selecionados) {
+          const conteudo = await window.electronAPI.lerNota(chk.dataset.nome);
+          blocos += `<section><h2>${chk.dataset.nome}</h2><pre>${conteudo}</pre><hr></section>`;
+        }
+
+        const novaJanela = window.open("", "_blank");
+        novaJanela.document.write(`
+          <html>
+          <head>
+            <title>Impressão de Notas</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 2rem; }
+              section { page-break-after: always; margin-bottom: 2rem; }
+              pre { background: #f5f5f5; padding: 1rem; border-radius: 6px; white-space: pre-wrap; }
+              h2 { margin-top: 0; }
+            </style>
+          </head>
+          <body>
+            <h1>Relatório de Notas Selecionadas</h1>
+            ${blocos}
+          </body>
+          </html>
+        `);
+        novaJanela.document.close();
+        novaJanela.print();
+      };
+
+      document.getElementById("btnVisualizarSelecionados").onclick = async () => {
+        const selecionados = Array.from(document.querySelectorAll(".linha-selecao:checked"));
+        if (selecionados.length === 0) {
+          alert("Nenhuma nota selecionada.");
+          return;
+        }
+      
+        const lista = [];
+        for (const chk of selecionados) {
+          const conteudo = await window.electronAPI.lerNota(chk.dataset.nome);
+          lista.push({ nome: chk.dataset.nome, conteudo });
+        }
+      
+        localStorage.setItem("notasSelecionadas", JSON.stringify(lista));
+        window.open("nota.html?multi=true", "_blank");
+      };
+      
+    });
   </script>
 </body>
 </html>

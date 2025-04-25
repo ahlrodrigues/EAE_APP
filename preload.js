@@ -10,5 +10,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   compareSync: (senhaDigitada, hash) => bcrypt.compareSync(senhaDigitada, hash),
   validarSenhaComHash: (senha, hash) => ipcRenderer.invoke("validar-senha-hash", senha, hash),
   salvarNota: (nome, conteudo) => ipcRenderer.invoke("salvar-nota", nome, conteudo),
+  excluirNota: (nome) => ipcRenderer.invoke("excluir-nota", nome)
 
 });
