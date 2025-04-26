@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
         await window.electronAPI.armazenarSenha(senhaDigitada);
 
         if (emailCorreto && senhaCorreta) {
-          alert("✅ Login realizado com sucesso!");
           window.location.href = "index.html";
         } else {
           alert("❌ E-mail ou senha inválidos.");

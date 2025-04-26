@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
@@ -27,6 +27,15 @@ function descriptografarCampo(textoCriptografado, chave) {
   let decrypted = decipher.update(encryptedText);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString("utf8");
+}
+
+function garantirPastaAnotacoes() {
+  const downloadsPath = app.getPath('downloads');
+  const anotacoesPath = path.join(downloadsPath, 'Anotações_EAE');
+  if (!fs.existsSync(anotacoesPath)) {
+    fs.mkdirSync(anotacoesPath);
+  }
+  return anotacoesPath;
 }
 
 ipcMain.handle("excluir-nota", async (event, nomeArquivo) => {
@@ -128,6 +137,25 @@ ipcMain.handle("listar-notas", async () => {
   }
 });
 
+ipcMain.handle('gerar-pdf-unico', async (event, html, nomeArquivoPersonalizado) => {
+  const tempWin = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  await tempWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+  const pdfBuffer = await tempWin.webContents.printToPDF({});
+
+  const anotacoesPath = garantirPastaAnotacoes();
+  const pdfPath = path.join(anotacoesPath, nomeArquivoPersonalizado || `Notas_EAE_${Date.now()}.pdf`);
+
+  fs.writeFileSync(pdfPath, pdfBuffer);
+
+  await tempWin.destroy();
+});
 
 ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
   try {

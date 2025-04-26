@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -45,10 +44,6 @@
       border-radius: 8px;
     }
 
-    .multi-nota h3 {
-      margin-top: 2rem;
-    }
-
     footer {
       margin-top: 2rem;
       text-align: center;
@@ -60,8 +55,7 @@
 <body>
   <div class="container">
     <header>
-      <img src="../assets/trevo.png" alt="Logo Trevo" />
-      <h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
+      
     </header>
 
     <h2 id="tituloNota">Nota</h2>
@@ -84,23 +78,24 @@
       const titulo = document.getElementById("tituloNota");
 
       if (multi === "true") {
+        titulo.textContent = "Notas Selecionadas";
+
         const lista = JSON.parse(localStorage.getItem("notasSelecionadas"));
         if (!lista || !Array.isArray(lista)) {
           container.textContent = "Nenhuma nota encontrada.";
           return;
         }
-            
+
         container.innerHTML = lista.map(n => {
           const partes = n.nome.split("T")[0].split("-");
           const dataFormatada = `${partes[2].padStart(2, "0")}-${partes[1].padStart(2, "0")}-${partes[0]}`;
-        
-          // Corrigir a data dentro do conteúdo da nota
+
           let conteudoFormatado = n.conteudo;
           conteudoFormatado = conteudoFormatado.replace(
             /^Data:\s*(\d{4})-(\d{2})-(\d{2})/m,
             (match, ano, mes, dia) => `Data: ${dia}-${mes}-${ano}`
           );
-        
+
           return `
             <div style="
               background: white;
@@ -110,7 +105,7 @@
               margin-bottom: 2rem;
               text-align: left;
             ">
-              <img src="../assets/trevo.png" alt="Logo Trevo" style="display: block; margin: 0 auto 1rem auto; max-width: 60px;" />
+              <img src="../assets/trevo.png" alt="Logo Trevo" style="display: block; margin: 0 auto 1rem auto; max-width: 100px;" />
               <pre style="
                 background: #f9f9f9;
                 padding: 1rem;
@@ -123,25 +118,19 @@
             </div>
           `;
         }).join("");
-        
-      }
-      
-      else {
+      } else {
         const dados = JSON.parse(localStorage.getItem("notaSelecionada"));
         if (!dados) {
           container.textContent = "Erro: nota não encontrada.";
           return;
         }
-      
-        
-        // Corrigir a data DENTRO do conteúdo da nota
+
         let conteudoFormatado = dados.conteudo;
         conteudoFormatado = conteudoFormatado.replace(
           /^Data:\s*(\d{4})-(\d{2})-(\d{2})/m,
           (match, ano, mes, dia) => `Data: ${dia}-${mes}-${ano}`
         );
-      
-        // Renderização da nota
+
         container.innerHTML = `
           <div style="
             background: white;
@@ -152,7 +141,6 @@
             text-align: left;
           ">
             <img src="../assets/trevo.png" alt="Logo Trevo" style="display: block; margin: 0 auto 1rem auto; max-width: 80px;" />
-            
             <pre style="
               background: #f9f9f9;
               padding: 1rem;
@@ -165,9 +153,7 @@
           </div>
         `;
       }
-      
-  
-    };  
+    };
   </script>
 </body>
 </html>

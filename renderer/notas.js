@@ -53,8 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!lista || !Array.isArray(lista)) return;
   
       document.getElementById("tituloNota").textContent = "Notas Selecionadas";
-      const bloco = lista.map(n => `<h3>${n.nome}</h3><pre>${n.conteudo}</pre><hr>`).join("");
+  
+      const bloco = lista.map(n => {
+        const nota = processarConteudoNota(n.conteudo); // Nova função que vamos criar
+        return gerarHtmlNota(nota); // Usar a função que monta o layout bonito
+      }).join('<hr style="margin:2rem 0;">');
+      
       document.getElementById("conteudoNota").innerHTML = bloco;
+      
     } else {
       const dados = JSON.parse(localStorage.getItem("notaSelecionada"));
       if (!dados) {
@@ -62,9 +68,107 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       document.getElementById("tituloNota").textContent = `Arquivo: ${dados.nome}`;
-      document.getElementById("conteudoNota").textContent = dados.conteudo;
+      document.getElementById("conteudoNota").innerHTML = gerarHtmlNota(JSON.parse(dados.conteudo));
     }
   };
+  
+
+  
+  document.getElementById('btnExportar').addEventListener('click', async () => {
+    const selecionadas = obterNotasSelecionadas();
+  
+    if (!selecionadas || selecionadas.length === 0) {
+      alert('Nenhuma nota selecionada para exportar!');
+      return;
+    }
+  
+    if (selecionadas.length === 1) {
+      // Exporta direto se apenas uma nota
+      const htmlNota = gerarHtmlNota(selecionadas[0]);
+      await window.electronAPI.gerarPdfUnico(htmlNota);
+      alert('✅ Anotação exportada com sucesso para a pasta Anotações_EAE!');
+    } else {
+      // Se múltiplas notas, exibe modal para escolha
+      document.getElementById('modalExportar').style.display = 'flex';
+    }
+  });
+  
+  // Confirmação da modal
+  document.getElementById('confirmarExportacao').addEventListener('click', async () => {
+    document.getElementById('modalExportar').style.display = 'none';
+  
+    const selecionadas = obterNotasSelecionadas();
+    const exportarUnico = document.getElementById('exportarUnico').checked;
+  
+    try {
+      if (exportarUnico) {
+        // Gera um único PDF com todas as notas
+        const htmlNotas = gerarHtmlNotasMultiplo(selecionadas);
+await window.electronAPI.gerarPdfUnico(htmlNotas);
+
+      } else {
+        // Gera PDFs separados
+        for (const nota of selecionadas) {
+          const htmlNota = gerarHtmlNota(nota);
+          await window.electronAPI.gerarPdfSeparado(htmlNota, nota.data);
+        }
+      }
+      alert('✅ Anotações exportadas com sucesso para a pasta Anotações_EAE!');
+    } catch (error) {
+      console.error('Erro ao exportar PDFs:', error);
+      alert('❌ Erro ao exportar PDFs.');
+    }
+  });
+  
+  function processarConteudoNota(conteudo) {
+    const nota = {};
+    const linhas = conteudo.split("\n");
+    
+    linhas.forEach(linha => {
+      if (linha.startsWith("Data:")) {
+        nota.data = linha.replace("Data:", "").trim();
+      } else if (linha.startsWith("Fato:")) {
+        nota.fato = linha.replace("Fato:", "").trim();
+      } else if (linha.startsWith("Reação:")) {
+        nota.reacao = linha.replace("Reação:", "").trim();
+      } else if (linha.startsWith("Sentimento:")) {
+        nota.sentimento = linha.replace("Sentimento:", "").trim();
+      } else if (linha.startsWith("Proposta:")) {
+        nota.proposta = linha.replace("Proposta:", "").trim();
+      }
+    });
+  
+    return nota;
+  }
+  
+
+  function gerarHtmlNotasMultiplo(notas) {
+    const conteudo = notas.map(nota => gerarHtmlNota(nota)).join('<hr style="margin:2rem 0;">');
+    return `
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <title>Anotações EAE</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 2rem; }
+          h2 { text-align: center; }
+        </style>
+      </head>
+      <body>
+        ${conteudo}
+      </body>
+      </html>
+    `;
+  }
+  
+  
+  function formatarData(data) {
+    if (!data) return '';
+    const partes = data.split('-');
+    if (partes.length !== 3) return data;
+    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+  }
   
 
   // Salvar nova nota
