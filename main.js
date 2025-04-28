@@ -3,11 +3,12 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { redefinirSenha } = require("./lib/redefinirSenha");
 
 const userDataPath = path.join(app.getPath("home"), ".config", "escola-aprendizes-final");
 const usuarioPath = path.join(userDataPath, "config", "usuario.json");
 const notasPath = path.join(userDataPath, "notas");
+
+
 
 function criptografarCampo(texto, chave) {
   const iv = crypto.randomBytes(16);
@@ -52,72 +53,82 @@ ipcMain.handle("excluir-nota", async (event, nomeArquivo) => {
 
 ipcMain.handle("ler-usuario", async () => {
   try {
-    if (!global.senhaDescriptografia) {
-      console.warn("⚠️ Senha não disponível em memória.");
-      throw new Error("Senha não está disponível em memória.");
-    }
-
     if (!fs.existsSync(usuarioPath)) {
       console.warn("⚠️ usuario.json não encontrado.");
       return null;
     }
 
     const raw = fs.readFileSync(usuarioPath, "utf-8");
-    const dadosCriptografados = JSON.parse(raw);
+    const dadosUsuario = JSON.parse(raw);
 
     const usuario = {
-      casaEspírita: descriptografarCampo(dadosCriptografados.casaEspírita, global.senhaDescriptografia),
-      numeroTurma: descriptografarCampo(dadosCriptografados.numeroTurma, global.senhaDescriptografia),
-      dirigente: descriptografarCampo(dadosCriptografados.dirigente, global.senhaDescriptografia),
-      secretarios: descriptografarCampo(dadosCriptografados.secretarios, global.senhaDescriptografia),
-      aluno: descriptografarCampo(dadosCriptografados.aluno, global.senhaDescriptografia),
-      email: descriptografarCampo(dadosCriptografados.email, global.senhaDescriptografia),
-      senha: dadosCriptografados.senha
+      casaEspírita: dadosUsuario.casaEspírita,
+      numeroTurma: dadosUsuario.numeroTurma,
+      dirigente: dadosUsuario.dirigente,
+      secretarios: dadosUsuario.secretarios,
+      aluno: dadosUsuario.aluno,
+      email: dadosUsuario.email,
+      senha: dadosUsuario.senha // bcrypt hash
     };
 
     return usuario;
   } catch (err) {
-    console.error("❌ Erro ao descriptografar usuario.json:", err.message);
+    console.error("❌ Erro ao carregar usuario.json:", err.message);
     return null;
   }
 });
 
-ipcMain.handle("validar-senha-hash", async (event, senhaDigitada, hashSalvo) => {
+ipcMain.handle('validar-senha-hash', async (event, senhaDigitada) => {
   try {
-    return bcrypt.compareSync(senhaDigitada, hashSalvo);
+    if (!fs.existsSync(usuarioPath)) {
+      throw new Error('Arquivo usuario.json não encontrado.');
+    }
+
+    const usuario = JSON.parse(fs.readFileSync(usuarioPath, 'utf8'));
+    const senhaHash = usuario.senha;
+
+    const senhaValida = await bcrypt.compare(senhaDigitada, senhaHash);
+
+    if (senhaValida) {
+      global.senhaDescriptografia = senhaDigitada;
+      console.log('✅ Login (validar-senha-hash): Senha validada com sucesso.');
+      return { sucesso: true };
+    } else {
+      console.warn('❌ Login (validar-senha-hash): Senha incorreta.');
+      return { sucesso: false, mensagem: 'Senha incorreta.' };
+    }
   } catch (err) {
-    console.error("Erro ao validar hash da senha:", err);
-    return false;
+    console.error('❌ Login (validar-senha-hash): Erro ao validar senha:', err.message);
+    return { sucesso: false, mensagem: 'Erro interno ao validar login.' };
   }
 });
 
 
-ipcMain.handle("salvar-cadastro", async (event, dados) => {
+ipcMain.handle('salvar-cadastro', async (event, dados) => {
   try {
     const pastaConfig = path.dirname(usuarioPath);
     if (!fs.existsSync(pastaConfig)) {
       fs.mkdirSync(pastaConfig, { recursive: true });
     }
 
-    const chave = dados.senha;
-    const dadosCriptografados = {
-      casaEspírita: criptografarCampo(dados.casaEspírita, chave),
-      numeroTurma: criptografarCampo(dados.numeroTurma, chave),
-      dirigente: criptografarCampo(dados.dirigente, chave),
-      emailDirigente: criptografarCampo(dados.emailDirigente, chave),
-      secretarios: criptografarCampo(dados.secretarios, chave),
-      aluno: criptografarCampo(dados.aluno, chave),
-      email: criptografarCampo(dados.email, chave),
-      senha: bcrypt.hashSync(chave, 10)
+    const senhaHash = await bcrypt.hash(dados.senha, 10);
+
+    const dadosParaSalvar = {
+      casaEspírita: dados.casaEspírita,
+      numeroTurma: dados.numeroTurma,
+      dirigente: dados.dirigente,
+      emailDirigente: dados.emailDirigente,
+      secretarios: dados.secretarios,
+      aluno: dados.aluno,
+      email: dados.email,
+      senha: senhaHash
     };
 
-    console.log("🛡️ VERIFICAÇÃO - Dados criptografados:");
-    console.log(JSON.stringify(dadosCriptografados, null, 2));
-    fs.writeFileSync(usuarioPath, JSON.stringify(dadosCriptografados, null, 2), "utf-8");
-    console.log("✅ usuario.json salvo com campos criptografados.");
+    fs.writeFileSync(usuarioPath, JSON.stringify(dadosParaSalvar, null, 2), 'utf8');
+    console.log('✅ usuario.json salvo com campos puros e senha protegida.');
     return true;
   } catch (err) {
-    console.error("Erro ao salvar cadastro:", err);
+    console.error('Erro ao salvar cadastro:', err);
     return false;
   }
 });
@@ -160,35 +171,17 @@ ipcMain.handle('gerar-pdf-unico', async (event, html, nomeArquivoPersonalizado) 
 
 const algorithm = 'aes-256-cbc'; // Algoritmo de criptografia
 
-ipcMain.handle('obter-nome-aluno', async (event) => {
+ipcMain.handle('obter-nome-aluno', async () => {
   try {
-    const userPath = path.join(app.getPath('home'), '.config', 'escola-aprendizes-final', 'usuario.json');
-
-    if (!fs.existsSync(userPath)) {
-      throw new Error('Cadastro não encontrado. Favor realizar novo cadastro.');
-    }
-
-    const encryptedData = fs.readFileSync(userPath);
-
-    const senha = global.senhaUsuario; // <- precisa estar carregada antes
-    if (!senha) {
-      throw new Error('Senha de descriptografia não encontrada em memória.');
-    }
-
-    const key = crypto.createHash('sha256').update(senha).digest();
-    const iv = Buffer.alloc(16, 0); // cuidado: só use IV zerado se a criptografia também usou
-
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encryptedData, null, 'utf8');
-    decrypted += decipher.final('utf8');
-
-    const dados = JSON.parse(decrypted);
-
-    return dados.aluno || null;
+    const caminhoCadastro = path.join(userDataPath, 'config', 'usuario.json');
+    const cadastroJson = fs.readFileSync(caminhoCadastro, 'utf8');
+    const cadastro = JSON.parse(cadastroJson);
+    
+    // NÃO descriptografar nada aqui! Só pegar o nome do aluno
+    return cadastro.aluno;
   } catch (error) {
     console.error('Erro ao obter nome do aluno:', error);
-
-    throw new Error(error.message || "Erro desconhecido ao obter nome do aluno.");
+    throw new Error('Cadastro não encontrado.');
   }
 });
 
@@ -246,16 +239,40 @@ function descriptografarNota(textoCriptografado, senha) {
   }
 }
 
-ipcMain.handle("redefinir-senha", async (event, tokenOuSenhaAntiga, novaSenha) => {
+
+
+const { redefinirSenha } = require('./lib/redefinirSenha');
+const { validarTokenDigitado } = require('./lib/validarToken');
+
+ipcMain.handle('redefinir-senha', async (event, tokenDigitado, novaSenha) => {
   try {
-    redefinirSenha(tokenOuSenhaAntiga, novaSenha);
+    console.log('🔵 Iniciando redefinição de senha...');
+
+    await validarTokenDigitado(tokenDigitado);
+    console.log('✅ Token validado.');
+
+    if (!fs.existsSync(usuarioPath)) {
+      throw new Error('Arquivo usuario.json não encontrado.');
+    }
+
+    const usuario = JSON.parse(fs.readFileSync(usuarioPath, 'utf8'));
+
+    const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+    usuario.senha = novaSenhaHash;
+
+    fs.writeFileSync(usuarioPath, JSON.stringify(usuario, null, 2), 'utf8');
+    console.log('✅ usuario.json atualizado com nova senha.');
+
     global.senhaDescriptografia = novaSenha;
-    return true;
+    console.log('✅ Nova senha atualizada na memória.');
+
+    return { sucesso: true };
   } catch (err) {
-    console.error("Erro redefinindo senha:", err.message);
-    return false;
+    console.error('❌ Erro redefinindo senha:', err.message);
+    return { sucesso: false, mensagem: err.message };
   }
 });
+
 
 let mainWindow; // Variável para a janela
 
@@ -334,4 +351,10 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+const { enviarToken } = require('./lib/enviarToken'); // no topo, junto dos requires
+
+ipcMain.handle('solicitar-token', async (event, emailDestino) => {
+  return await enviarToken(emailDestino);
 });

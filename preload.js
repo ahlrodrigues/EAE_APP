@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   excluirNota: (nome) => ipcRenderer.invoke("excluir-nota", nome),
   gerarPdfUnico: (html, nomeArquivoPersonalizado) => ipcRenderer.invoke('gerar-pdf-unico', html, nomeArquivoPersonalizado),
   obterNomeAluno: () => ipcRenderer.invoke('obter-nome-aluno'),
+  solicitarToken: (email) => ipcRenderer.invoke("solicitar-token", email),
 });
