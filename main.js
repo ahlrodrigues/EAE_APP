@@ -104,6 +104,7 @@ ipcMain.handle("salvar-cadastro", async (event, dados) => {
       casaEspírita: criptografarCampo(dados.casaEspírita, chave),
       numeroTurma: criptografarCampo(dados.numeroTurma, chave),
       dirigente: criptografarCampo(dados.dirigente, chave),
+      emailDirigente: criptografarCampo(dados.emailDirigente, chave),
       secretarios: criptografarCampo(dados.secretarios, chave),
       aluno: criptografarCampo(dados.aluno, chave),
       email: criptografarCampo(dados.email, chave),
@@ -156,6 +157,41 @@ ipcMain.handle('gerar-pdf-unico', async (event, html, nomeArquivoPersonalizado) 
 
   await tempWin.destroy();
 });
+
+const algorithm = 'aes-256-cbc'; // Algoritmo de criptografia
+
+ipcMain.handle('obter-nome-aluno', async (event) => {
+  try {
+    const userPath = path.join(app.getPath('home'), '.config', 'escola-aprendizes-final', 'usuario.json');
+
+    if (!fs.existsSync(userPath)) {
+      throw new Error('Cadastro não encontrado. Favor realizar novo cadastro.');
+    }
+
+    const encryptedData = fs.readFileSync(userPath);
+
+    const senha = global.senhaUsuario; // <- precisa estar carregada antes
+    if (!senha) {
+      throw new Error('Senha de descriptografia não encontrada em memória.');
+    }
+
+    const key = crypto.createHash('sha256').update(senha).digest();
+    const iv = Buffer.alloc(16, 0); // cuidado: só use IV zerado se a criptografia também usou
+
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    let decrypted = decipher.update(encryptedData, null, 'utf8');
+    decrypted += decipher.final('utf8');
+
+    const dados = JSON.parse(decrypted);
+
+    return dados.aluno || null;
+  } catch (error) {
+    console.error('Erro ao obter nome do aluno:', error);
+
+    throw new Error(error.message || "Erro desconhecido ao obter nome do aluno.");
+  }
+});
+
 
 ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
   try {
@@ -221,31 +257,81 @@ ipcMain.handle("redefinir-senha", async (event, tokenOuSenhaAntiga, novaSenha) =
   }
 });
 
-function createMainWindow() {
-  const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
+let mainWindow; // Variável para a janela
+
+function createWindow() {
+  // Cria a pasta config se não existir
+  const configPath = path.join(app.getPath('home'), '.config', 'escola-aprendizes-final', 'config');
+
+  if (!fs.existsSync(configPath)) {
+    fs.mkdirSync(configPath, { recursive: true });
+  }
+
+  const userDataPath = path.join(configPath, 'usuario.json');
+
+  // Criação da janela principal
+  mainWindow = new BrowserWindow({
+    show: false, // Para maximizar antes de mostrar
+    icon: path.join(__dirname, 'assets', 'trevo.png'),
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
-  mainWindow.loadFile("pages/login.html");
+
+  mainWindow.maximize();
+  mainWindow.show();
+
+  // Lógica para abrir a página correta
+  if (fs.existsSync(userDataPath)) {
+    try {
+      const conteudo = fs.readFileSync(userDataPath, 'utf8');
+      JSON.parse(conteudo); // Testa se o JSON é válido
+
+      // Se o JSON for válido, carrega login.html
+      mainWindow.loadFile(path.join(__dirname, 'pages', 'login.html'));
+    } catch (error) {
+      console.error('Erro no usuario.json, resetando:', error);
+
+      // Se erro no JSON, resetar o arquivo e abrir cadastro.html
+      try {
+        fs.writeFileSync(userDataPath, '{}', 'utf8');
+        console.log('usuario.json resetado.');
+      } catch (erroGravacao) {
+        console.error('Erro ao resetar usuario.json:', erroGravacao);
+      }
+
+      mainWindow.loadFile(path.join(__dirname, 'pages', 'cadastro.html'));
+    }
+  } else {
+    // Se não existir o arquivo usuario.json, abrir cadastro.html
+    mainWindow.loadFile(path.join(__dirname, 'pages', 'cadastro.html'));
+  }
+
+  // Quando a janela for fechada
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
 app.whenReady().then(() => {
-  createMainWindow();
-  app.on("activate", () => {
+  createWindow();
+
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow();
+      createWindow();
     }
   });
 });
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
-

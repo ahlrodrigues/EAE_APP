@@ -1,114 +1,98 @@
-// cadastro.js — validação dinâmica + envio com console.log para debug + ícones de visualização de senha
+// Captura dos elementos
+const senhaInput = document.getElementById('senha');
+const confirmarSenhaInput = document.getElementById('confirmarsenha');
+const toggleSenha1 = document.getElementById('toggleSenha1');
+const toggleSenha2 = document.getElementById('toggleSenha2');
+const cadastroForm = document.getElementById('cadastroForm');
+const mensagem = document.getElementById('mensagem');
 
-document.addEventListener("DOMContentLoaded", () => {
-  const senhaInput = document.getElementById("senha");
-  const confirmarInput = document.getElementById("confirmarSenha");
-  const toggleSenha = document.getElementById("toggleSenha");
+// Função: Alternar visualização de senha
+function configurarToggleSenha(botao, campoSenha) {
+  botao.addEventListener('click', () => {
+    const tipo = campoSenha.type === 'password' ? 'text' : 'password';
+    campoSenha.type = tipo;
+    botao.textContent = tipo === 'password' ? '👁️' : '🙈';
+  });
+}
 
-  const regraMaiuscula = document.getElementById("regra-maiuscula");
-  const regraMinuscula = document.getElementById("regra-minuscula");
-  const regraNumero = document.getElementById("regra-numero");
-  const regraSimbolo = document.getElementById("regra-simbolo");
-  const regraTamanho = document.getElementById("regra-tamanho");
+// Função: Atualizar validação visual da senha
+function validarSenhaVisual() {
+  const senha = senhaInput.value;
 
-  if (toggleSenha && senhaInput) {
-    toggleSenha.addEventListener("click", () => {
-      const visivel = senhaInput.type === "text";
-      senhaInput.type = visivel ? "password" : "text";
-      toggleSenha.title = visivel ? "Mostrar senha" : "Ocultar senha";
-      toggleSenha.textContent = visivel ? "👁️" : "🙈";
-    });
+  const regras = [
+    { id: 'regra-maiuscula', regex: /[A-Z]/, texto: 'Pelo menos 1 letra maiúscula' },
+    { id: 'regra-minuscula', regex: /[a-z]/, texto: 'Pelo menos 1 letra minúscula' },
+    { id: 'regra-numero', regex: /\d/, texto: 'Pelo menos 1 número' },
+    { id: 'regra-simbolo', regex: /[^A-Za-z0-9]/, texto: 'Pelo menos 1 símbolo' },
+    { id: 'regra-tamanho', regex: /.{8,}/, texto: 'Pelo menos 8 caracteres' }
+  ];
+
+  regras.forEach(regra => {
+    const elemento = document.getElementById(regra.id);
+    if (regra.regex.test(senha)) {
+      elemento.innerHTML = `✅ <span style="color:green;">${regra.texto}</span>`;
+    } else {
+      elemento.innerHTML = `❌ <span style="color:red;">${regra.texto}</span>`;
+    }
+  });
+}
+
+// Função: Salvar cadastro
+async function salvarCadastro(dados) {
+  try {
+    await window.electronAPI.salvarCadastro(dados);
+    mensagem.textContent = 'Cadastro salvo com sucesso!';
+    mensagem.style.color = 'green';
+    cadastroForm.reset();
+
+    // Adicionando redirecionamento para login.html após sucesso
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500); // Espera 1.5 segundos antes de redirecionar
+  } catch (error) {
+    console.error('Erro ao salvar cadastro:', error);
+    mensagem.textContent = 'Erro ao salvar cadastro. Tente novamente.';
+    mensagem.style.color = 'red';
+  }
+}
+
+
+// Função: Lidar com o envio do formulário
+async function handleCadastroSubmit(e) {
+  e.preventDefault();
+
+  const casaEspírita = document.getElementById('casaEspírita').value.trim();
+  const numeroTurma = document.getElementById('numeroTurma').value.trim();
+  const dirigente = document.getElementById('dirigente').value.trim();
+  const emailDirigente = document.getElementById('emailDirigente').value.trim();
+  const secretarios = document.getElementById('secretarios').value.trim();
+  const aluno = document.getElementById('aluno').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = senhaInput.value.trim();
+  const confirmarSenha = confirmarSenhaInput.value.trim();
+
+  if (senha !== confirmarSenha) {
+    mensagem.textContent = 'As senhas não coincidem!';
+    mensagem.style.color = 'red';
+    return;
   }
 
-  // Adiciona botão de visualização para confirmarSenha se não existir
-  if (confirmarInput && !confirmarInput.parentElement.querySelector(".toggle-confirmar")) {
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.innerText = "👁️";
-    toggle.title = "Mostrar senha";
-    toggle.className = "toggle-confirmar";
-    toggle.style.position = "absolute";
-    toggle.style.right = "10px";
-    toggle.style.top = "5px";
-    toggle.style.border = "none";
-    toggle.style.background = "none";
-    toggle.style.cursor = "pointer";
-    toggle.style.fontSize = "1.2rem";
+  const dadosCadastro = {
+    casaEspírita,
+    numeroTurma,
+    dirigente,
+    emailDirigente,
+    secretarios,
+    aluno,
+    email,
+    senha // NÃO incluir confirmarsenha
+  };
 
-    const wrapper = confirmarInput.parentElement;
-    wrapper.style.position = "relative";
-    wrapper.appendChild(toggle);
+  await salvarCadastro(dadosCadastro);
+}
 
-    toggle.addEventListener("click", () => {
-      const visivel = confirmarInput.type === "text";
-      confirmarInput.type = visivel ? "password" : "text";
-      toggle.title = visivel ? "Mostrar senha" : "Ocultar senha";
-      toggle.textContent = visivel ? "👁️" : "🙈";
-    });
-  }
-
-  if (senhaInput) {
-    senhaInput.addEventListener("input", () => {
-      const senha = senhaInput.value;
-      regraMaiuscula.textContent = /[A-Z]/.test(senha) ? "✔️ " + regraMaiuscula.dataset.texto : "❌ " + regraMaiuscula.dataset.texto;
-      regraMinuscula.textContent = /[a-z]/.test(senha) ? "✔️ " + regraMinuscula.dataset.texto : "❌ " + regraMinuscula.dataset.texto;
-      regraNumero.textContent = /[0-9]/.test(senha) ? "✔️ " + regraNumero.dataset.texto : "❌ " + regraNumero.dataset.texto;
-      regraSimbolo.textContent = /[^A-Za-z0-9]/.test(senha) ? "✔️ " + regraSimbolo.dataset.texto : "❌ " + regraSimbolo.dataset.texto;
-      regraTamanho.textContent = senha.length >= 8 ? "✔️ " + regraTamanho.dataset.texto : "❌ " + regraTamanho.dataset.texto;
-    });
-  }
-
-  const form = document.getElementById("cadastroForm");
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const senha = senhaInput.value.trim();
-      const confirmar = confirmarInput.value.trim();
-
-      const senhaValida = (
-        senha.length >= 8 &&
-        /[A-Z]/.test(senha) &&
-        /[a-z]/.test(senha) &&
-        /[0-9]/.test(senha) &&
-        /[^A-Za-z0-9]/.test(senha)
-      );
-
-      if (!senhaValida) {
-        alert("A senha não atende aos critérios mínimos de segurança.");
-        return;
-      }
-
-      if (senha !== confirmar) {
-        alert("As senhas não coincidem.");
-        return;
-      }
-
-      const dados = {
-        casaEspírita: document.getElementById("casaEspírita").value.trim(),
-        numeroTurma: document.getElementById("numeroTurma").value.trim(),
-        dirigente: document.getElementById("dirigente").value.trim(),
-        secretarios: document.getElementById("secretarios").value.trim(),
-        aluno: document.getElementById("aluno").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        senha
-      };
-
-      console.log("🟡 Dados enviados ao main:", dados);
-
-      try {
-        const sucesso = await window.electronAPI.salvarCadastro(dados);
-        if (sucesso) {
-          alert("Cadastro salvo com sucesso!");
-          window.location.href = "login.html";
-          form.reset();
-        } else {
-          alert("Erro ao salvar cadastro.");
-        }
-      } catch (err) {
-        console.error("Erro ao salvar cadastro:", err);
-        alert("Erro interno ao salvar cadastro.");
-      }
-    });
-  }
-});
+// Inicialização dos eventos
+configurarToggleSenha(toggleSenha1, senhaInput);
+configurarToggleSenha(toggleSenha2, confirmarSenhaInput);
+senhaInput.addEventListener('input', validarSenhaVisual);
+cadastroForm.addEventListener('submit', handleCadastroSubmit);
