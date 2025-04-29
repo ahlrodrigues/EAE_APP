@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #e0f7fa;
+      background: #ecfae0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -40,20 +40,51 @@
     button:hover {
       background: #b71c1c;
     }
+    .botoes-voltar button {
+      text-decoration: none;
+      background-color: #117508;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .botoes-voltar button:hover {
+      background-color: #117508;
+    }
+    
   </style>
 </head>
 <body>
+  <script>
+    async function carregarMensagemAleatoria() {
+      try {
+        const resposta = await fetch("https://seusite.com/mensagem.txt"); // substitua por seu link real
+        const texto = await resposta.text();
+        const mensagens = texto.split("\\n").map(l => l.trim()).filter(Boolean);
+        const aleatoria = mensagens[Math.floor(Math.random() * mensagens.length)];
+        document.getElementById("mensagemRemota").textContent = aleatoria;
+      } catch (erro) {
+        document.getElementById("mensagemRemota").textContent = "Mensagem indisponível no momento.";
+      }
+    }
+    carregarMensagemAleatoria();
+  </script>
+  
+  <img src="../assets/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
+  <h1 id="mensagemDinamica">Carregando mensagem...</h1>
   <div class="container">
-    <img src="../assets/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
-    <h1>Bem-vindo à Escola de Aprendizes do Evangelho</h1>
+    
+    
     <p>Você está logado com sucesso!</p>
-    <button onclick="window.location.href='notas.html'" style="background: #00796b; margin-top: 1rem;">
-      + Anotação
-    </button>
-    <button onclick="window.location.href='relatorio.html'" style="background: #0288d1; margin-top: 1rem;">
-      📄 Ver Relatório de Notas
-    </button>
-    <button onclick="logout()">Sair</button>
+    <div class="botoes-voltar">
+      <button onclick="location.href='notas.html'">📝 + Anotações</button>
+      <button onclick="location.href='relatorio.html'">📄 Relatório</button>
+      <button onclick="logout()">Sair</button>
+    </div>
   </div>
 
   <script>

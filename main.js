@@ -39,6 +39,7 @@ function garantirPastaAnotacoes() {
   return anotacoesPath;
 }
 
+
 ipcMain.handle("excluir-nota", async (event, nomeArquivo) => {
   try {
     const filePath = path.join(notasPath, nomeArquivo);
@@ -199,6 +200,19 @@ ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
     return "Erro ao carregar nota.";
   }
 });
+
+ipcMain.handle('descriptografar', async (event, conteudoCriptografado, senha) => {
+  try {
+    const decipher = crypto.createDecipher('aes-256-cbc', senha);
+    let decrypted = decipher.update(conteudoCriptografado, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (error) {
+    console.error('Erro ao descriptografar nota:', error.message);
+    throw new Error('Erro ao descriptografar a nota.');
+  }
+});
+
 
 ipcMain.handle("salvar-nota", async (event, nomeArquivo, conteudo) => {
   try {

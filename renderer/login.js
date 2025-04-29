@@ -1,40 +1,25 @@
+document.getElementById("loginForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("loginForm");
-  const emailInput = document.getElementById("email");
-  const senhaInput = document.getElementById("senha");
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
 
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  try {
+    const valido = await window.electronAPI.validarSenhaHash(senha);
 
-      const emailDigitado = emailInput.value.trim();
-      const senhaDigitada = senhaInput.value.trim();
-
-      try {
-        await window.electronAPI.armazenarSenha(senhaDigitada);
-        const usuario = await window.electronAPI.lerUsuario();
-
-        if (!usuario) {
-          alert("Erro ao carregar os dados do usuário.");
-          return;
-        }
-
-        const emailCorreto = usuario.email === emailDigitado;
-
-        // validação segura usando bcrypt direto via Electron
-        const senhaCorreta = await window.electronAPI.validarSenhaComHash(senhaDigitada, usuario.senha);
-        await window.electronAPI.armazenarSenha(senhaDigitada);
-
-        if (emailCorreto && senhaCorreta) {
-          window.location.href = "index.html";
-        } else {
-          alert("❌ E-mail ou senha inválidos.");
-        }
-      } catch (err) {
-        console.error("Erro ao autenticar login:", err);
-        alert("Erro ao tentar logar. Consulte o suporte.");
-      }
-    });
+    if (valido) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("mensagem").textContent = "Senha incorreta. Tente novamente.";
+    }
+  } catch (error) {
+    console.error("Erro no login:", error);
+    document.getElementById("mensagem").textContent = "Erro ao validar senha.";
   }
+});
+
+// ✅ Olho da senha
+document.getElementById("toggleSenha").addEventListener("click", () => {
+  const senhaField = document.getElementById("senha");
+  senhaField.type = senhaField.type === "password" ? "text" : "password";
 });
