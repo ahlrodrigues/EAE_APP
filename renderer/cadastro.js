@@ -1,10 +1,12 @@
 document.getElementById("cadastroForm").addEventListener("submit", async (event) => {
+  console.log('Submit acionado');
   event.preventDefault();
 
   const senhaInput = document.getElementById("senha");
   const confirmarSenhaInput = document.getElementById("confirmarsenha");
   const senha = senhaInput.value;
   const confirmarSenha = confirmarSenhaInput.value;
+  console.log("Cadastro.js carregado");
 
   // Verificação dos critérios da senha
   const requisitos = {

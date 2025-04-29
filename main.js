@@ -8,6 +8,19 @@ const userDataPath = path.join(app.getPath("home"), ".config", "escola-aprendize
 const usuarioPath = path.join(userDataPath, "config", "usuario.json");
 const notasPath = path.join(userDataPath, "notas");
 
+const { registrarHandlers } = require('./handlers');
+
+function createMainWindow() {
+  const win = new BrowserWindow({
+    width: 1000,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+
+  win.loadFile(path.join(__dirname, 'pages/login.html')); // ou outro arquivo inicial
+}
 
 
 function criptografarCampo(texto, chave) {
@@ -79,76 +92,15 @@ ipcMain.handle("ler-usuario", async () => {
   }
 });
 
-ipcMain.handle('validar-senha-hash', async (event, senhaDigitada) => {
-  try {
-    if (!fs.existsSync(usuarioPath)) {
-      throw new Error('Arquivo usuario.json não encontrado.');
-    }
-
-    const usuario = JSON.parse(fs.readFileSync(usuarioPath, 'utf8'));
-    const senhaHash = usuario.senha;
-
-    const senhaValida = await bcrypt.compare(senhaDigitada, senhaHash);
-
-    if (senhaValida) {
-      global.senhaDescriptografia = senhaDigitada;
-      console.log('✅ Login (validar-senha-hash): Senha validada com sucesso.');
-      return { sucesso: true };
-    } else {
-      console.warn('❌ Login (validar-senha-hash): Senha incorreta.');
-      return { sucesso: false, mensagem: 'Senha incorreta.' };
-    }
-  } catch (err) {
-    console.error('❌ Login (validar-senha-hash): Erro ao validar senha:', err.message);
-    return { sucesso: false, mensagem: 'Erro interno ao validar login.' };
-  }
-});
 
 
-ipcMain.handle('salvar-cadastro', async (event, dados) => {
-  try {
-    const pastaConfig = path.dirname(usuarioPath);
-    if (!fs.existsSync(pastaConfig)) {
-      fs.mkdirSync(pastaConfig, { recursive: true });
-    }
 
-    const senhaHash = await bcrypt.hash(dados.senha, 10);
-
-    const dadosParaSalvar = {
-      casaEspírita: dados.casaEspírita,
-      numeroTurma: dados.numeroTurma,
-      dirigente: dados.dirigente,
-      emailDirigente: dados.emailDirigente,
-      secretarios: dados.secretarios,
-      aluno: dados.aluno,
-      email: dados.email,
-      senha: senhaHash
-    };
-
-    fs.writeFileSync(usuarioPath, JSON.stringify(dadosParaSalvar, null, 2), 'utf8');
-    console.log('✅ usuario.json salvo com campos puros e senha protegida.');
-    return true;
-  } catch (err) {
-    console.error('Erro ao salvar cadastro:', err);
-    return false;
-  }
-});
 
 ipcMain.handle("armazenar-senha", async (event, senhaPura) => {
   global.senhaDescriptografia = senhaPura;
   return true;
 });
 
-ipcMain.handle("listar-notas", async () => {
-  const notasPath = path.join(app.getPath("home"), ".config", "escola-aprendizes-final", "notas");
-  try {
-    if (!fs.existsSync(notasPath)) return [];
-    return fs.readdirSync(notasPath).filter(nome => nome.endsWith(".txt"));
-  } catch (err) {
-    console.error("Erro ao listar notas:", err);
-    return [];
-  }
-});
 
 ipcMain.handle('gerar-pdf-unico', async (event, html, nomeArquivoPersonalizado) => {
   const tempWin = new BrowserWindow({
@@ -187,73 +139,15 @@ ipcMain.handle('obter-nome-aluno', async () => {
 });
 
 
-ipcMain.handle("ler-nota", async (event, nomeArquivo) => {
-  try {
-    if (!global.senhaDescriptografia) {
-      throw new Error("Senha de descriptografia não está definida.");
-    }
-    const caminho = path.join(notasPath, nomeArquivo);
-    const conteudoCriptografado = fs.readFileSync(caminho, "utf-8");
-    return descriptografarNota(conteudoCriptografado, global.senhaDescriptografia);
-  } catch (err) {
-    console.error("Erro ao ler nota:", err);
-    return "Erro ao carregar nota.";
-  }
+const { criptografar, descriptografar, descriptografarNota } = require('./lib/crypto');
+
+ipcMain.handle("descriptografar", async (event, texto, senha) => {
+  return descriptografar(texto, senha);
 });
 
-ipcMain.handle('descriptografar', async (event, conteudoCriptografado, senha) => {
-  try {
-    const decipher = crypto.createDecipher('aes-256-cbc', senha);
-    let decrypted = decipher.update(conteudoCriptografado, 'base64', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-  } catch (error) {
-    console.error('Erro ao descriptografar nota:', error.message);
-    throw new Error('Erro ao descriptografar a nota.');
-  }
+ipcMain.handle("criptografar", async (event, texto, senha) => {
+  return criptografar(texto, senha);
 });
-
-
-ipcMain.handle("salvar-nota", async (event, nomeArquivo, conteudo) => {
-  try {
-    if (!global.senhaDescriptografia) {
-      throw new Error("Senha não disponível.");
-    }
-
-    const iv = crypto.randomBytes(16);
-    const key = crypto.createHash("sha256").update(global.senhaDescriptografia).digest();
-    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
-    let encrypted = cipher.update(conteudo, "utf8");
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    const finalContent = `${iv.toString("base64")}:${encrypted.toString("base64")}`;
-
-    const filePath = path.join(notasPath, nomeArquivo);
-    fs.writeFileSync(filePath, finalContent, "utf-8");
-    return true;
-  } catch (err) {
-    console.error("Erro ao salvar nota criptografada:", err);
-    return false;
-  }
-});
-
-
-function descriptografarNota(textoCriptografado, senha) {
-  try {
-    const [ivBase64, conteudoBase64] = textoCriptografado.split(":");
-    const iv = Buffer.from(ivBase64, "base64");
-    const encryptedText = Buffer.from(conteudoBase64, "base64");
-    const chave = crypto.createHash("sha256").update(senha).digest();
-    const decipher = crypto.createDecipheriv("aes-256-cbc", chave, iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString("utf8");
-  } catch (e) {
-    console.error("Erro ao descriptografar:", e.message);
-    return "Erro ao descriptografar a nota.";
-  }
-}
-
-
 
 const { redefinirSenha } = require('./lib/redefinirSenha');
 const { validarTokenDigitado } = require('./lib/validarToken');
@@ -344,15 +238,15 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
+console.log("MAIN.JS - Aplicação iniciando...");
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+app.whenReady().then(() => {
+  console.log("MAIN.JS - App está pronto!");
+  createMainWindow();
+  console.log("MAIN.JS - Chamando registrarHandlers...");
+  registrarHandlers(ipcMain);
 });
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

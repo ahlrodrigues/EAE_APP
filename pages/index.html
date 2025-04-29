@@ -14,14 +14,29 @@
       justify-content: center;
       min-height: 100vh;
       text-align: center;
+      
     }
-    .container {
+    .layout-horizontal {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+    }
+    .container-esquerdo, .container-direito {
       background: white;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 90%;
+      width: 300px;
+      max-width: 100%;
+    }
+
+    .container-central {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 480px;
+      max-width: 100%;
     }
     h1 {
       color: #00796b;
@@ -40,7 +55,7 @@
     button:hover {
       background: #b71c1c;
     }
-    .botoes-voltar button {
+    .botoes button {
       text-decoration: none;
       background-color: #117508;
       color: white;
@@ -52,8 +67,12 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-    .botoes-voltar button:hover {
-      background-color: #117508;
+    #mensagemRemota {
+      color: #00796b;
+      font-size: 1.5rem;
+      font-weight: normal;
+      font-style: italic;
+      margin-bottom: 1.5rem;
     }
     
   </style>
@@ -62,31 +81,42 @@
   <script>
     async function carregarMensagemAleatoria() {
       try {
-        const resposta = await fetch("https://seusite.com/mensagem.txt"); // substitua por seu link real
+        const resposta = await fetch("https://geea.com.br/mensagens.txt"); // substitua pelo link real
         const texto = await resposta.text();
-        const mensagens = texto.split("\\n").map(l => l.trim()).filter(Boolean);
+        const mensagens = texto.split('---')
+          .map(m => m.trim())
+          .filter(Boolean);
         const aleatoria = mensagens[Math.floor(Math.random() * mensagens.length)];
         document.getElementById("mensagemRemota").textContent = aleatoria;
       } catch (erro) {
         document.getElementById("mensagemRemota").textContent = "Mensagem indisponível no momento.";
       }
     }
+ 
     carregarMensagemAleatoria();
   </script>
   
   <img src="../assets/trevo.png" alt="Logo Trevo" style="max-width: 200px; margin-bottom: 1rem;" />
-  <h1 id="mensagemDinamica">Carregando mensagem...</h1>
-  <div class="container">
-    
-    
-    <p>Você está logado com sucesso!</p>
-    <div class="botoes-voltar">
-      <button onclick="location.href='notas.html'">📝 + Anotações</button>
-      <button onclick="location.href='relatorio.html'">📄 Relatório</button>
-      <button onclick="logout()">Sair</button>
+  <div class="layout-horizontal">
+    <div class="container-esquerdo">
+      <p>Conteúdo Lateral Esquerdo</p>
     </div>
+
+  <div class="container-central">
+    <h1 id="mensagemRemota">Carregando mensagem...</h1>
   </div>
 
+  <div class="container-direito">
+    <p>Conteúdo Lateral Direito</p>
+  </div>
+
+</div>
+
+<div class="botoes" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+  <button onclick="location.href='notas.html'">📝 + Anotações</button>
+  <button onclick="location.href='relatorio.html'">📄 Relatório</button>
+  <button onclick="logout()">Sair</button>
+</div>
   <script>
     function logout() {
       window.location.href = 'login.html';

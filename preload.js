@@ -10,6 +10,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   salvarNota: (nome, conteudo) => ipcRenderer.invoke('salvar-nota', nome, conteudo),
   listarNotas: () => ipcRenderer.invoke('listar-notas'),
   lerNota: (nome) => ipcRenderer.invoke('ler-nota', nome),
+  criptografar: (texto, senha) => ipcRenderer.invoke('criptografar', texto, senha),
+  gerarPdfUnico: (conteudo, nomeArquivo) => ipcRenderer.invoke('gerar-pdf', conteudo, nomeArquivo),
+  lerUsuario: () => ipcRenderer.invoke('ler-usuario'),
+  getSenhaUsuario: () => ipcRenderer.invoke('get-senha-usuario'),
+  armazenarSenha: (senha) => ipcRenderer.invoke('armazenar-senha', senha),
+  descriptografar: (conteudo, senha) => ipcRenderer.invoke("descriptografar", conteudo, senha),
+  excluirNota: (nome) => ipcRenderer.invoke('excluir-nota', nome),
+
 
   // Autenticação
   validarSenha: (senha) => ipcRenderer.invoke('validar-senha', senha),

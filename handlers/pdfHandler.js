@@ -2,7 +2,7 @@
 
 const { BrowserWindow, dialog } = require('electron');
 const fs = require('fs');
-
+const { getUserDataPath } = require('../config/paths');
 function registrarPdfHandlers(ipcMain) {
   ipcMain.handle('gerar-pdf', async (event, conteudo, nomeArquivo) => {
     const tempWin = new BrowserWindow({ show: false, webPreferences: { offscreen: true } });

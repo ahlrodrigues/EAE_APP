@@ -1,11 +1,10 @@
-// handlers/cadastroHandler.js
-
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const { getUserDataPath } = require('../config/paths');
 
 function registrarCadastroHandlers(ipcMain) {
+  console.log("Registrando salvar-cadastro...");
+
   ipcMain.handle('salvar-cadastro', async (event, dados) => {
     const dir = getUserDataPath();
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

@@ -1,0 +1,59 @@
+import { formatarData } from './utilitarios.js';
+
+export async function renderTabela(lista) {
+  const tabela = document.querySelector("#tabelaNotas tbody");
+  if (!tabela) return;
+
+  tabela.innerHTML = "";
+  lista.forEach((nome, index) => {
+    const tr = document.createElement("tr");
+
+    const tdCheckbox = document.createElement("td");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "linha-selecao";
+    checkbox.dataset.nome = nome;
+    tdCheckbox.appendChild(checkbox);
+
+    const tdIndex = document.createElement("td");
+    tdIndex.textContent = index + 1;
+
+    const tdData = document.createElement("td");
+    tdData.textContent = formatarData(nome.substring(0, 10));
+
+    const tdAcao = document.createElement("td");
+    const btnVer = document.createElement("button");
+    btnVer.textContent = "Ver nota";
+    btnVer.onclick = () => visualizarNota(nome);
+    tdAcao.appendChild(btnVer);
+
+    tr.appendChild(tdCheckbox);
+    tr.appendChild(tdIndex);
+    tr.appendChild(tdData);
+    tr.appendChild(tdAcao);
+
+    tabela.appendChild(tr);
+  });
+}
+
+async function visualizarNota(nome) {
+  const senhaNota = await window.electronAPI.getSenhaUsuario();
+  if (!senhaNota) {
+    alert("Senha não carregada. Faça login novamente.");
+    return;
+  }
+
+  try {
+    const conteudoCriptografado = await window.electronAPI.lerNota(nome);
+    const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senhaNota);
+
+    const partes = nome.substring(0, 10).split("-");
+    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+    localStorage.setItem("notaSelecionada", JSON.stringify({ data: dataFormatada, conteudo }));
+    window.open("nota.html", "_blank");
+  } catch (error) {
+    console.error("Erro ao visualizar nota:", error);
+    alert("Erro ao abrir a nota.");
+  }
+}

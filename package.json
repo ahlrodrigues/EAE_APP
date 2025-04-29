@@ -4,7 +4,8 @@
   "description": "App com cadastro local via Electron",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron --no-warnings .",
+    "start:dev": "NODE_ENV=development electron --no-warnings ."
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

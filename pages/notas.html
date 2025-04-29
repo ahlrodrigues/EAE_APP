@@ -68,16 +68,19 @@
       font-weight: bold;
       max-width: 500px;
     }
-    .botoes-voltar a {
+    .botoes button {
       text-decoration: none;
       background-color: #117508;
       color: white;
       padding: 0.5rem 1rem;
       border-radius: 8px;
       font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
       transition: background 0.3s ease;
     }
-    .botoes-voltar a:hover {
+    .botoes button:hover {
       background-color: #117508;
     }
   </style>
@@ -95,11 +98,11 @@
     <button type="submit">Salvar anotação</button>
   </form>
 <br>
-  <div class="botoes-voltar">
-    <a href="index.html">⬅️ Início</a>
-    <a href="relatorio.html">📄 Relatório</a>
-    <button onclick="logout()">Sair</button>
-  </div>
+<div class="botoes" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+  <button onclick="location.href='index.html'">⬅️ Início</button>
+  <button onclick="location.href='relatorio.html'">📄 Relatório</button>
+  <button onclick="logout()">Sair</button>
+</div>
   
 <br>
 

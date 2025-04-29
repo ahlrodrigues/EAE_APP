@@ -12,9 +12,9 @@ document.getElementById("formNota").addEventListener("submit", async (event) => 
     const data = new Date(dataInput.value);
     const agora = new Date();
 
-    const nomeArquivo = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}_${String(agora.getSeconds()).padStart(2, '0')}_${String(agora.getMinutes()).padStart(2, '0')}_${String(agora.getHours()).padStart(2, '0')}-${nomeAluno}.txt`;
+    const nomeArquivo = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}_${String(agora.getHours()).padStart(2, '0')}_${String(agora.getMinutes()).padStart(2, '0')}_${String(agora.getSeconds()).padStart(2, '0')}-${nomeAluno}.txt`;
 
-    const conteudo = `
+    const conteudoClaro = `
 Data: ${data.toLocaleDateString('pt-BR')}
 Fato: ${fatoInput.value}
 Reação: ${reacaoInput.value}
@@ -22,7 +22,12 @@ Sentimento: ${sentimentoInput.value}
 Proposta: ${propostaInput.value}
 `.trim();
 
-    await window.electronAPI.salvarNota(nomeArquivo, conteudo);
+    const senha = await window.electronAPI.getSenhaUsuario();
+    const conteudoCriptografado = await window.electronAPI.criptografar(conteudoClaro, senha);
+
+
+    await window.electronAPI.salvarNota(nomeArquivo, conteudoCriptografado);
+
     alert("Nota salva com sucesso!");
     document.getElementById("formNota").reset();
   } catch (error) {
