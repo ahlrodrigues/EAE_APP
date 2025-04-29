@@ -1,4 +1,10 @@
+<p align="center" width="100%">
+    <img src="https://geea.com.br/imagem/trevo.png">
+</p>
 
+
+
+**SLACKONFIG** - um scripts para configuração do Slackware GNU/Linux e instalação de algumas "firulas".
 --------------
 
 
