@@ -35,14 +35,14 @@ independente da nossa vontade.
 ```
 
 
-**Scripts e Funções:**
+**Usage:**
 ----------------------
 ```
 
 ```
 
 
-Usage:
+**Feature:**
 ------
 ```
 [ ] Automatizar o footer
