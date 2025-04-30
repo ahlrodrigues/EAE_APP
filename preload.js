@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   armazenarSenha: (senha) => ipcRenderer.invoke('armazenar-senha', senha),
   descriptografar: (conteudo, senha) => ipcRenderer.invoke("descriptografar", conteudo, senha),
   excluirNota: (nome) => ipcRenderer.invoke('excluir-nota', nome),
+  exportarNotas: (html, nome) => ipcRenderer.invoke('exportar-notas', html, nome),
 
 
   // Autenticação

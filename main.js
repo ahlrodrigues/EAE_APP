@@ -64,6 +64,22 @@ ipcMain.handle("excluir-nota", async (event, nomeArquivo) => {
   }
 });
 
+ipcMain.handle('exportar-notas', async (event, conteudoHTML, nomeArquivo) => {
+  const tempWin = new BrowserWindow({ show: false, webPreferences: { offscreen: true } });
+  await tempWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(conteudoHTML)}`);
+  const pdfData = await tempWin.webContents.printToPDF({});
+
+  const downloads = app.getPath('downloads');
+  const pasta = path.join(downloads, 'Anotações_EAE');
+  if (!fs.existsSync(pasta)) fs.mkdirSync(pasta, { recursive: true });
+
+  const caminhoFinal = path.join(pasta, nomeArquivo || 'Notas_EAE.pdf');
+  fs.writeFileSync(caminhoFinal, pdfData);
+  tempWin.destroy();
+
+  return caminhoFinal;
+});
+
 
 ipcMain.handle("ler-usuario", async () => {
   try {

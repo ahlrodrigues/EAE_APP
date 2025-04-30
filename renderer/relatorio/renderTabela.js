@@ -5,36 +5,47 @@ export async function renderTabela(lista) {
   if (!tabela) return;
 
   tabela.innerHTML = "";
-  lista.forEach((nome, index) => {
+  for (const [index, nome] of lista.entries()) {
     const tr = document.createElement("tr");
-
+    tr.dataset.nome = nome;
+  
+    try {
+      const senha = await window.electronAPI.getSenhaUsuario();
+      const conteudoCriptografado = await window.electronAPI.lerNota(nome);
+      const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senha);
+      tr.dataset.conteudo = conteudo;
+    } catch (erro) {
+      console.error(`Erro ao carregar conteúdo da nota ${nome}:`, erro);
+      tr.dataset.conteudo = "[Erro ao carregar]";
+    }
+  
     const tdCheckbox = document.createElement("td");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "linha-selecao";
     checkbox.dataset.nome = nome;
     tdCheckbox.appendChild(checkbox);
-
+  
     const tdIndex = document.createElement("td");
     tdIndex.textContent = index + 1;
-
+  
     const tdData = document.createElement("td");
     tdData.textContent = formatarData(nome.substring(0, 10));
-
+  
     const tdAcao = document.createElement("td");
     const btnVer = document.createElement("button");
     btnVer.textContent = "Ver nota";
     btnVer.onclick = () => visualizarNota(nome);
     tdAcao.appendChild(btnVer);
-
+  
     tr.appendChild(tdCheckbox);
     tr.appendChild(tdIndex);
     tr.appendChild(tdData);
     tr.appendChild(tdAcao);
-
+  
     tabela.appendChild(tr);
-  });
-}
+  }
+}  
 
 async function visualizarNota(nome) {
   const senhaNota = await window.electronAPI.getSenhaUsuario();

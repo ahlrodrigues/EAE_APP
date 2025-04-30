@@ -45,7 +45,20 @@ independente da nossa vontade.
 Usage:
 ------
 ```
-
+[ ] Automatizar o footer
+[X] excluir nota
+[X] Exportação das notas para PDF
+[ ] envio das notas selecionadas para o dirigente 
+[ ] importação de arquivos dos dirigentes 
+[ ] Envio para FDJ 
+[ ] Quadro de aviso 
+[ ] Atualização via Github 
+[ ] Sobre - aviso, lgpd e licença 
+[ ] Formulário de contato
+[ ] modular css
+[ ] importar áudio / vídeo
+[ ] link para o trevo 
+[ ] mostrar canal AEE
 ```
 
 

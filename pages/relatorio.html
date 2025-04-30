@@ -40,6 +40,19 @@ footer { text-align: center; margin-top: 2rem; padding: 1rem; font-size: 0.85rem
 <button id="btnExportarSelecionados">Exportar</button>
 <button id="btnExcluirSelecionados">Excluir</button>
 </div>
+<!-- Modal de exportação -->
+<div id="modalExportar" style="display:none; position:fixed; inset:0; background-color:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:white; padding:2rem; border-radius:12px; max-width:400px; text-align:center;">
+      <h3>Exportar Notas Selecionadas</h3>
+      <p>Como deseja exportar as notas selecionadas?</p>
+      <div style="text-align:left; margin: 1rem 0;">
+        <label><input type="radio" name="tipoExportacao" value="unico"> Gerar um único PDF</label><br/>
+        <label><input type="radio" name="tipoExportacao" value="separado" checked> Gerar PDFs separados</label>
+      </div>
+      <button id="confirmarExportacao">Confirmar Exportação</button>
+    </div>
+  </div>
+  
 <table id="tabelaNotas">
 <thead>
 <tr>
