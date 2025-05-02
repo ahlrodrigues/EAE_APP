@@ -3,7 +3,7 @@ export function inicializarSelecaoTodos() {
     if (!chkTodos) return;
   
     chkTodos.addEventListener("change", () => {
-      const checkboxes = document.querySelectorAll(".linha-selecao");
+      const checkboxes = document.querySelectorAll(".seletor-nota");
       checkboxes.forEach(checkbox => {
         checkbox.checked = chkTodos.checked;
       });

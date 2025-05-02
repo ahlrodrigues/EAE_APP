@@ -73,7 +73,7 @@ export async function exportarNotasUnico(checkboxes) {
   const nomeArquivo = `${dataStr}_${horaStr}-${nomeAluno}.pdf`;
 
   const caminho = await window.electronAPI.exportarNotas(htmlNotas, nomeArquivo);
-  alert(`PDF salvo em: ${caminho}`);
+
 }
 
 export async function exportarNotasSeparadas(checkboxes) {

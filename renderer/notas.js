@@ -1,37 +1,71 @@
-document.getElementById("formNota").addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const dataInput = document.getElementById("data");
-  const fatoInput = document.getElementById("fato");
-  const reacaoInput = document.getElementById("reacao");
-  const sentimentoInput = document.getElementById("sentimento");
-  const propostaInput = document.getElementById("proposta");
-
+document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const nomeAluno = await window.electronAPI.obterNomeAluno();
-    const data = new Date(dataInput.value);
-    const agora = new Date();
+    const arquivos = await window.electronAPI.listarNotas();
+    console.log("Arquivos encontrados:", arquivos);
 
-    const nomeArquivo = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}_${String(agora.getHours()).padStart(2, '0')}_${String(agora.getMinutes()).padStart(2, '0')}_${String(agora.getSeconds()).padStart(2, '0')}-${nomeAluno}.txt`;
+    const tabela = document.querySelector("#tabelaNotas tbody");
+    if (!tabela) {
+      console.warn("⚠️ Tabela não encontrada.");
+      return;
+    }
 
-    const conteudoClaro = `
-Data: ${data.toLocaleDateString('pt-BR')}
-Fato: ${fatoInput.value}
-Reação: ${reacaoInput.value}
-Sentimento: ${sentimentoInput.value}
-Proposta: ${propostaInput.value}
-`.trim();
+    if (arquivos.length === 0) {
+      tabela.innerHTML = "<tr><td colspan='5'>Nenhuma nota encontrada.</td></tr>";
+      return;
+    }
 
-    const senha = await window.electronAPI.getSenhaUsuario();
-    const conteudoCriptografado = await window.electronAPI.criptografar(conteudoClaro, senha);
+    tabela.innerHTML = "";
 
-
-    await window.electronAPI.salvarNota(nomeArquivo, conteudoCriptografado);
-
-    alert("Nota salva com sucesso!");
-    document.getElementById("formNota").reset();
+    for (const [index, nome] of arquivos.entries()) {
+      try {
+        const conteudo = await window.electronAPI.lerNota(nome);
+        const data = nome.split("_")[0].split("-").reverse().join("-");
+    
+        const linha = `
+          <tr>
+            <td><input type="checkbox" data-nome="${nome}"></td>
+            <td>${index + 1}</td>
+            <td>${data}</td>
+            <td><button class="verNota" data-nome="${nome}">Ver nota</button></td>
+          </tr>
+        `;
+        tabela.insertAdjacentHTML("beforeend", linha);
+      } catch (err) {
+        console.error(`Erro ao carregar conteúdo da nota ${nome}:`, err);
+      }
+    }
+    document.querySelector("#tabelaNotas tbody").addEventListener("click", (event) => {
+      const btn = event.target.closest(".verNota");
+      if (!btn) return;
+    
+      const nome = btn.dataset.nome;
+      if (!nome) return;
+    
+      visualizarNota(nome);
+    });
+    async function visualizarNota(nome) {
+      const senhaNota = await window.electronAPI.getSenhaUsuario();
+      if (!senhaNota) {
+        alert("Senha não carregada. Faça login novamente.");
+        return;
+      }
+    
+      try {
+        const conteudoCriptografado = await window.electronAPI.lerNota(nome);
+        const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senhaNota);
+    
+        const partes = nome.substring(0, 10).split("-");
+        const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+    
+        localStorage.setItem("notaSelecionada", JSON.stringify({ data: dataFormatada, conteudo }));
+        window.open("nota.html", "_blank");
+      } catch (error) {
+        console.error("Erro ao visualizar nota:", error);
+        alert("Erro ao abrir a nota.");
+      }
+    }
+        
   } catch (error) {
-    console.error("Erro ao salvar nota:", error);
-    alert("Erro ao salvar a nota. Verifique o console para mais detalhes.");
+    console.error("Erro ao listar notas:", error);
   }
 });

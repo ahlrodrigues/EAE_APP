@@ -1,5 +1,3 @@
-// renderer/relatorio/utilitarios.js
-
 export function formatarData(data) {
     if (!data) return "";
     const partes = data.split("-");

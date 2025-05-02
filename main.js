@@ -118,25 +118,6 @@ ipcMain.handle("armazenar-senha", async (event, senhaPura) => {
 });
 
 
-ipcMain.handle('gerar-pdf-unico', async (event, html, nomeArquivoPersonalizado) => {
-  const tempWin = new BrowserWindow({
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-
-  await tempWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-  const pdfBuffer = await tempWin.webContents.printToPDF({});
-
-  const anotacoesPath = garantirPastaAnotacoes();
-  const pdfPath = path.join(anotacoesPath, nomeArquivoPersonalizado || `Notas_EAE_${Date.now()}.pdf`);
-
-  fs.writeFileSync(pdfPath, pdfBuffer);
-
-  await tempWin.destroy();
-});
 
 const algorithm = 'aes-256-cbc'; // Algoritmo de criptografia
 
@@ -264,21 +245,11 @@ app.whenReady().then(() => {
 });
 
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-const { enviarToken } = require('./lib/enviarToken'); // no topo, junto dos requires
 
-ipcMain.handle('solicitar-token', async (event, emailDestino) => {
-  return await enviarToken(emailDestino);
-});
+

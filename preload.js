@@ -11,21 +11,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listarNotas: () => ipcRenderer.invoke('listar-notas'),
   lerNota: (nome) => ipcRenderer.invoke('ler-nota', nome),
   criptografar: (texto, senha) => ipcRenderer.invoke('criptografar', texto, senha),
-  gerarPdfUnico: (conteudo, nomeArquivo) => ipcRenderer.invoke('gerar-pdf', conteudo, nomeArquivo),
   lerUsuario: () => ipcRenderer.invoke('ler-usuario'),
   getSenhaUsuario: () => ipcRenderer.invoke('get-senha-usuario'),
   armazenarSenha: (senha) => ipcRenderer.invoke('armazenar-senha', senha),
   descriptografar: (conteudo, senha) => ipcRenderer.invoke("descriptografar", conteudo, senha),
   excluirNota: (nome) => ipcRenderer.invoke('excluir-nota', nome),
   exportarNotas: (html, nome) => ipcRenderer.invoke('exportar-notas', html, nome),
-
+  abrirVisualizacaoNotas: (html) => ipcRenderer.invoke("abrir-visualizacao-notas", html),
+  enviarEmail: (dados) => ipcRenderer.invoke("enviar-email-dirigente", dado),
+  gerarPdfAnexosParaEmail: (conteudos, nomes, tipo) => ipcRenderer.invoke("gerar-pdf-anexos-email", conteudos, nomes, tipo),
+  
+  
 
   // Autenticação
   validarSenha: (senha) => ipcRenderer.invoke('validar-senha', senha),
   validarSenhaHash: (senha) => ipcRenderer.invoke('validar-senha-hash', senha),
 
-  // PDF
-  gerarPdf: (conteudo, nomeArquivo) => ipcRenderer.invoke('gerar-pdf', conteudo, nomeArquivo),
+  gerarPdf: (html, nomeArquivo, salvarNoDisco = true) => ipcRenderer.invoke('gerar-pdf', html, nomeArquivo, salvarNoDisco),
 
   // E-mail
   enviarToken: (token) => ipcRenderer.invoke('enviar-token', token),

@@ -1,5 +1,6 @@
-import { arquivos } from './relatorio.js';
-import { refreshSenha } from './utilitarios.js';
+import { arquivos } from '../relatorio.js';
+arquivos.length = 0;
+arquivos.push(...novosArquivos);
 
 export function inicializarAcoesNotas() {
   const btnVisualizar = document.getElementById("btnVisualizarSelecionados");
@@ -23,7 +24,7 @@ async function visualizarSelecionadas() {
   }
 
   const selecionadas = [];
-  const checkboxes = document.querySelectorAll(".linha-selecao:checked");
+  const checkboxes = document.querySelectorAll(".-selecao:checked");
   for (const checkbox of checkboxes) {
     const nomeNota = checkbox.dataset.nome;
     try {
@@ -35,24 +36,21 @@ async function visualizarSelecionadas() {
     }
   }
 
-  if (selecionadas.length === 0) {
-    alert("Nenhuma nota selecionada.");
-    return;
-  }
+  
 
   localStorage.setItem("notasSelecionadas", JSON.stringify(selecionadas));
   window.open("nota.html?multi=true", "_blank");
 }
 
 async function excluirSelecionadas() {
-  const checkboxes = document.querySelectorAll(".linha-selecao:checked");
+  const checkboxes = document.querySelectorAll(".seletor-nota:checked");
   if (checkboxes.length === 0) {
     alert("Nenhuma nota selecionada para excluir.");
     return;
   }
 
   if (!confirm("Tem certeza que deseja excluir as notas selecionadas?")) return;
-
+linha
   try {
     for (const checkbox of checkboxes) {
       const nomeNota = checkbox.dataset.nome;
@@ -63,6 +61,9 @@ async function excluirSelecionadas() {
     const novosArquivos = await window.electronAPI.listarNotas();
     const { renderTabela } = await import('./renderTabela.js');
     renderTabela(novosArquivos);
+
+
+    
 
     alert("Notas excluídas com sucesso!");
   } catch (error) {

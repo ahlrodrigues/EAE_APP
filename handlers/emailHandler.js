@@ -1,5 +1,3 @@
-// handlers/emailHandler.js
-
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
@@ -24,6 +22,29 @@ function registrarEmailHandlers(ipcMain) {
       to: emailDestino,
       subject: 'Token de redefinição de senha',
       text: `Seu token é: ${token}`
+    };
+
+    await transporter.sendMail(mailOptions);
+  });
+
+  ipcMain.handle('enviar-email-dirigente', async (event, { para, assunto, corpo, anexos, confirmarLeitura }) => {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_REMETENTE,
+        pass: process.env.SENHA_REMETENTE
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_REMETENTE,
+      to: para,
+      subject,
+      html: corpo,
+      attachments: anexos,
+      headers: {
+        'Disposition-Notification-To': confirmarLeitura
+      }
     };
 
     await transporter.sendMail(mailOptions);

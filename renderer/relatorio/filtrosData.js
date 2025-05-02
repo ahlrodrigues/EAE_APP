@@ -1,7 +1,6 @@
 import { renderTabela } from './renderTabela.js';
-import { arquivos } from './relatorio.js';
 
-export function aplicarFiltros(lista) {
+export function aplicarFiltros(listaOriginal) {
   const dataInicioInput = document.getElementById("dataInicio");
   const dataFimInput = document.getElementById("dataFim");
 
@@ -9,9 +8,9 @@ export function aplicarFiltros(lista) {
     const dataInicio = dataInicioInput.value ? new Date(dataInicioInput.value) : null;
     const dataFim = dataFimInput.value ? new Date(dataFimInput.value) : null;
 
-    let listaFiltrada = arquivos;
+    let listaFiltrada = listaOriginal;
     if (dataInicio || dataFim) {
-      listaFiltrada = arquivos.filter(nome => {
+      listaFiltrada = listaOriginal.filter(nome => {
         const dataNota = new Date(nome.substring(0, 10));
         if (dataInicio && dataNota < dataInicio) return false;
         if (dataFim && dataNota > dataFim) return false;
