@@ -20,30 +20,45 @@ export function inicializarRelatorio() {
   });
 
   window.electronAPI.listarNotas()
-    .then(arquivos => {
-      console.log("📁 Arquivos encontrados:", arquivos);
+  .then(arquivos => {
+    console.log("📁 Arquivos retornados pelo listarNotas:", arquivos);
+
+    const selecionadas = JSON.parse(sessionStorage.getItem("notasSelecionadas") || "[]");
+    console.log("📤 Nomes das notas selecionadas do sessionStorage:", selecionadas);
+
+    if (Array.isArray(selecionadas) && selecionadas.length > 0) {
+      const notasFiltradas = arquivos.filter(nota => selecionadas.includes(nota.nomeArquivo));
+      console.log("📌 Notas filtradas para exibição:", notasFiltradas);
+
+      renderTabela(notasFiltradas);
+      aplicarFiltros(notasFiltradas);
+      sessionStorage.removeItem("notasSelecionadas");
+    } else {
+      console.log("🔁 Sem seleção prévia. Exibindo todas as notas.");
       renderTabela(arquivos);
       aplicarFiltros(arquivos);
-      inicializarAcoesNotas(); 
-    })
-    .catch(error => {
-      console.error("❌ Erro ao listar notas:", error);
-      exibirAviso("Erro ao carregar", "Não foi possível carregar as notas. Tente novamente.");
-    });
+    }
+
+    inicializarAcoesNotas();
+  })
+  .catch(error => {
+    console.error("❌ Erro ao listar notas:", error);
+    exibirAviso("Erro ao carregar", "Não foi possível carregar as notas. Tente novamente.");
+  });
+
 }
 
 async function visualizarSelecionadas() {
-  const selecionadas = document.querySelectorAll("input.seletor-nota:checked");
+  const checkboxes = document.querySelectorAll('input.seletor-nota[type="checkbox"]:checked');
+  const nomes = Array.from(checkboxes)
+    .map(cb => cb.value || cb.dataset.nome)
+    .filter(nome => !!nome);
 
-  if (selecionadas.length === 0) {
-    exibirAviso(
-      "Nenhuma anotação selecionada",
-      `Por favor, selecione ao menos uma anotação para continuar.`
-    );
+  if (nomes.length === 0) {
+    alert("Nenhuma nota selecionada.");
     return;
   }
 
-  const nomes = Array.from(selecionadas).map(cb => cb.dataset.nome);
   const senha = await window.electronAPI.getSenhaUsuario();
   const notas = [];
 
@@ -58,9 +73,15 @@ async function visualizarSelecionadas() {
     }
   }
 
+  if (notas.length === 0) {
+    alert("Nenhuma nota pôde ser lida.");
+    return;
+  }
+
   localStorage.setItem("notasSelecionadas", JSON.stringify(notas));
   window.open("nota.html?multi=true", "_blank");
 }
+
 
 function filtrarNotasPorData() {
   const dataInicio = document.getElementById("dataInicio").value;
@@ -80,10 +101,20 @@ function selecionarTodas(event) {
 
 function visualizarNota(nomeArquivo) {
   window.electronAPI.abrirNota(nomeArquivo)
-  .then(conteudo => {
-    exibirAviso("Anotação", `<pre style="text-align:left">${conteudo}</pre>`);
-  })
-  .catch(error => {
-    exibirAviso("Erro ao abrir", "Não foi possível abrir a nota selecionada.");
-  })
+    .then(conteudo => {
+      exibirAviso("Anotação", `<pre style="text-align:left">${conteudo}</pre>`);
+    })
+    .catch(async error => {
+      console.error("❌ Erro ao abrir a nota:", error);
+      exibirAviso("Erro ao abrir", "Não foi possível abrir a nota selecionada.");
+
+      // 🔁 Recarrega a lista de notas após erro
+      try {
+        const todasNotas = await window.electronAPI.listarNotas();
+        renderTabela(todasNotas);
+        aplicarFiltros(todasNotas);
+      } catch (erroRecarregar) {
+        console.error("❌ Erro ao recarregar notas após falha:", erroRecarregar);
+      }
+    });
 }

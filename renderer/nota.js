@@ -22,7 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     container.innerHTML = lista.map(n => {
-      let conteudoFormatado = formatarDataTexto(n.conteudo);
+      
+      let conteudo = n.conteudo || "";
+      let conteudoFormatado = formatarDataTexto(conteudo);
+
       return `
         <div style="
           background: white;
@@ -44,7 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
           ">${conteudoFormatado}</pre>
         </div>
       `;
-    }).join("");
+    })
+    .join("");
   } else {
     const dados = JSON.parse(localStorage.getItem("notaSelecionada"));
     if (!dados) {

@@ -147,39 +147,58 @@ background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: cent
 </div>
 
 <footer>Relatório local — Escola de Aprendizes do Evangelho — 2025</footer>
-
+<script type="module" src="../renderer/relatorio.js"></script>
+<script type="module" src="../renderer/relatorio/envioEmailNotas.js"></script>
 <script>
   const btnEnviarEmail = document.getElementById('btnEnviarEmailDirigente');
-  const modal = document.getElementById('modalEnvioEmail');
   const modalConteudo = document.getElementById('modalEnvioConteudo');
   const btnFecharModal = document.getElementById('btnFecharModalEnvio');
 
   btnEnviarEmail.addEventListener('click', () => {
     const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const modal = document.getElementById('modalEnvioEmail');
+    const modalConteudo = document.getElementById('modalEnvioConteudo');
+  
+    if (!modal) {
+      console.error("❌ Modal não encontrado!");
+      return;
+    }
+  
     if (checkboxes.length === 0) {
       modalConteudo.innerHTML = `
         <p><strong>Nenhuma anotação foi selecionada.</strong></p>
         <p>Por favor, selecione ao menos uma anotação para continuar.</p>
       `;
     } else {
+      const nomesNotasSelecionadas = [...checkboxes]
+        .map(cb => cb.dataset.nome )
+        .filter(Boolean);
+  
+        function formatarNomeNotaElegante(nomeArquivo) {
+          const [ano, mes, dia, hora, minuto, segundo, ...nomePartes] = nomeArquivo
+            .replace('.txt', '')
+            .split(/[_-]/);
+          const nomeAluno = nomePartes.join(' ').trim();
+          return `${dia}/${mes}/${ano} às ${hora}:${minuto} — ${nomeAluno}`;
+        }
+        
+        const listaNotasHtml = nomesNotasSelecionadas
+          .map(nome => `<li>${formatarNomeNotaElegante(nome)}</li>`)
+          .join('');
+  
       modalConteudo.innerHTML = `
+        <p><strong>Você selecionou ${nomesNotasSelecionadas.length} anotações:</strong></p>
+        <ul style="text-align: left; font-size: 0.95rem; max-height: 200px; overflow-y: auto; padding-left: 1rem;">
+          ${listaNotasHtml}
+        </ul>
         <p>Como deseja enviar as anotações?</p>
         <label><input type="radio" name="tipoEnvio" value="unico" checked> Enviar em um único PDF</label><br><br>
         <label><input type="radio" name="tipoEnvio" value="separado"> Enviar como arquivos separados</label><br><br>
-        <button id="btnVerEnvioEmail">Ver notas</button>
         <button id="btnConfirmarEnvioEmail">Enviar Agora</button>
       `;
     }
+  
     modal.style.display = 'flex';
   });
-
-  btnFecharModal.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
+  
 </script>
-
-</body>
-</html>
-
-<script type="module" src="../renderer/relatorio.js"></script>
-<script type="module" src="../renderer/relatorio/envioEmailNotas.js"></script>

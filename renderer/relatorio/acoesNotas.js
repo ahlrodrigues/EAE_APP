@@ -14,6 +14,7 @@ export function inicializarAcoesNotas() {
 }
 
 async function visualizarSelecionadas() {
+  console.log("🧩 Ações das notas inicializadas");
   await refreshSenha();
   const senhaNota = await window.electronAPI.getSenhaUsuario();
   if (!senhaNota) {
@@ -22,7 +23,7 @@ async function visualizarSelecionadas() {
   }
 
   const selecionadas = [];
-  const checkboxes = document.querySelectorAll(".-selecao:checked");
+  const checkboxes = document.querySelectorAll(".seletor-nota:checked");
   for (const checkbox of checkboxes) {
     const nomeNota = checkbox.dataset.nome;
     try {
@@ -34,11 +35,19 @@ async function visualizarSelecionadas() {
     }
   }
 
-  
+  if (selecionadas.length === 0) {
+    alert("Nenhuma nota pôde ser lida.");
+    return;
+  }
+
+  // (opcional) Exibir nomes lidos
+  const nomesLidos = selecionadas.map(n => `<li>${n.nome}</li>`).join("");
+  await exibirAviso("Notas selecionadas", `<ul style="text-align:left">${nomesLidos}</ul>`);
 
   localStorage.setItem("notasSelecionadas", JSON.stringify(selecionadas));
   window.open("nota.html?multi=true", "_blank");
 }
+
 
 async function excluirSelecionadas() {
   console.log("🔴 Botão excluir clicado"); // debug

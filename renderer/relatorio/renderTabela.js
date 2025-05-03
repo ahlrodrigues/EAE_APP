@@ -19,14 +19,16 @@ export async function renderTabela(lista) {
       tr.dataset.conteudo = "[Erro ao carregar]";
     }
 
+    const checkboxes = document.querySelectorAll('input.seletor-nota[type="checkbox"]:checked');
     const tdCheckbox = document.createElement("td");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.classList.add("seletor-nota");
-    checkbox.dataset.nome = nome;
-    tdCheckbox.appendChild(checkbox);
-    console.log("✅ Checkbox criado com classe:", checkbox.className);
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.classList.add("seletor-nota");
+  checkbox.dataset.nome = nome;
+  tdCheckbox.appendChild(checkbox);
 
+  console.log("✅ Checkbox criado com classe:", checkbox.className);
+  
     const tdIndex = document.createElement("td");
     tdIndex.textContent = index + 1;
 
