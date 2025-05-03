@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   excluirNota: (nome) => ipcRenderer.invoke('excluir-nota', nome),
   exportarNotas: (html, nome) => ipcRenderer.invoke('exportar-notas', html, nome),
   abrirVisualizacaoNotas: (html) => ipcRenderer.invoke("abrir-visualizacao-notas", html),
-  enviarEmail: (dados) => ipcRenderer.invoke("enviar-email-dirigente", dado),
+  enviarEmail: (dados) => ipcRenderer.invoke("enviar-email-dirigente", dados),
   gerarPdfAnexosParaEmail: (conteudos, nomes, tipo) => ipcRenderer.invoke("gerar-pdf-anexos-email", conteudos, nomes, tipo),
   obterCadastro: () => ipcRenderer.invoke('obter-cadastro'),
   

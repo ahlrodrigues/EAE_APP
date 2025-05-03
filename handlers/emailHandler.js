@@ -32,15 +32,15 @@ function registrarEmailHandlers(ipcMain) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_REMETENTE,
-        pass: process.env.SENHA_REMETENTE
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
       }
     });
 
     const mailOptions = {
       from: process.env.EMAIL_REMETENTE,
       to: para,
-      subject,
+      subject: assunto,
       html: corpo,
       attachments: anexos,
       headers: {
@@ -51,28 +51,7 @@ function registrarEmailHandlers(ipcMain) {
     await transporter.sendMail(mailOptions);
   });
 
-  ipcMain.handle('gerar-pdf-anexos-email', async (event, conteudos, nomes, tipo) => {
-    const anexos = [];
 
-    if (tipo === 'unico') {
-      const htmlUnico = conteudos.map((c, i) => `<div><h3>${nomes[i]}</h3><div>${c}</div></div>`).join('<hr>');
-      const pdf = await gerarPdfBuffer(htmlUnico);
-      anexos.push({
-        filename: `Notas_${new Date().toISOString().split('T')[0]}.pdf`,
-        content: pdf,
-      });
-    } else {
-      for (let i = 0; i < conteudos.length; i++) {
-        const pdf = await gerarPdfBuffer(conteudos[i]);
-        anexos.push({
-          filename: `${nomes[i].replace('.txt', '')}.pdf`,
-          content: pdf,
-        });
-      }
-    }
-
-    return anexos;
-  });
 
   async function gerarPdfBuffer(html) {
     const win = new BrowserWindow({ show: false });

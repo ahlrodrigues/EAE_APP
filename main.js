@@ -12,7 +12,7 @@ const { registrarHandlers } = require('./handlers');
 
 const { registrarEmailHandlers } = require('./handlers/emailHandler');
 
-
+require('dotenv').config();
 
 function createMainWindow() {
   const win = new BrowserWindow({
@@ -251,6 +251,7 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-
+const { registrarGerarPdfAnexosEmailHandler } = require('./handlers/gerarPdfAnexosEmailHandler');
+registrarGerarPdfAnexosEmailHandler(ipcMain);
 
 

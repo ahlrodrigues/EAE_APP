@@ -1,7 +1,7 @@
 export function setupEventosEnvioEmail() {
   console.log('setupEventosEnvioEmail foi chamado');
 
-  // Escuta cliques em toda a página (útil para elementos recriados dinamicamente)
+  // Escuta cliques em toda a página
   document.addEventListener('click', async (event) => {
     const id = event.target.id;
     console.log('🖱️ Clique detectado:', id);
@@ -10,6 +10,8 @@ export function setupEventosEnvioEmail() {
       await visualizarNotasSelecionadas();
     } else if (id === 'btnConfirmarEnvioEmail') {
       await enviarNotasPorEmail();
+    } else if (id === 'btnFecharModalEnvio') {
+      document.getElementById('modalEnvioEmail').style.display = 'none';
     }
   });
 }
@@ -30,9 +32,14 @@ async function visualizarNotasSelecionadas() {
 
     console.log("📋 Notas selecionadas para visualização:", nomesNotas);
 
-    const conteudos = await Promise.all(
-      nomesNotas.map(nome => window.electronAPI.lerNota(nome))
-    );
+    const senha = await window.electronAPI.getSenhaUsuario();
+const conteudos = await Promise.all(
+  nomesNotas.map(async (nome) => {
+    const cripto = await window.electronAPI.lerNota(nome);
+    return await window.electronAPI.descriptografar(cripto, senha);
+  })
+);
+
 
     const htmlFinal = conteudos.map(c => `
       <div class="notaVisualizada" style="margin-bottom:2rem; border:1px solid #ccc; padding:1rem; border-radius:8px;">
@@ -97,18 +104,3 @@ async function enviarNotasPorEmail() {
     alert('Erro ao enviar e-mail.');
   }
 }
-document.addEventListener('click', async (event) => {
-  const id = event.target.id;
-  console.log('🖱️ Clique detectado:', id);
-
-  if (id === 'btnVerEnvioEmail') {
-    await visualizarNotasSelecionadas();
-  }
-
-  if (id === 'btnConfirmarEnvioEmail') {
-    await enviarNotasPorEmail();
-  }
-});
-document.getElementById('btnFecharModalEnvio')?.addEventListener('click', () => {
-  document.getElementById('modalEnvioEmail').style.display = 'none';
-});
