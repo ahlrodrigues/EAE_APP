@@ -65,6 +65,13 @@ footer { text-align: center; margin-top: 2rem; padding: 1rem; font-size: 0.85rem
   background-color: #dc3545;
   color: white;
 }
+#modalEnvioConteudo ul {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f9;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  list-style: none;
+}
 
 </style>
 </head>
@@ -188,7 +195,7 @@ background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: cent
   
       modalConteudo.innerHTML = `
         <p><strong>Você selecionou ${nomesNotasSelecionadas.length} anotações:</strong></p>
-        <ul style="text-align: left; font-size: 0.95rem; max-height: 200px; overflow-y: auto; padding-left: 1rem;">
+        <ul>
           ${listaNotasHtml}
         </ul>
         <p>Como deseja enviar as anotações?</p>
