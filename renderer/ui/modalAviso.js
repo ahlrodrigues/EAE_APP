@@ -14,3 +14,25 @@ export function exibirAviso(titulo, mensagemHtml) {
     modal.style.display = "none";
   }, { once: true });
 }
+export function exibirConfirmacao(titulo, mensagem) {
+  return new Promise(resolve => {
+    const modal = document.getElementById("modalConfirmacaoPadrao");
+    const tituloElem = modal.querySelector(".titulo");
+    const msgElem = modal.querySelector(".mensagem");
+
+    tituloElem.textContent = titulo;
+    msgElem.textContent = mensagem;
+
+    modal.style.display = "flex";
+
+    modal.querySelector(".btnSim").onclick = () => {
+      modal.style.display = "none";
+      resolve(true);
+    };
+
+    modal.querySelector(".btnNao").onclick = () => {
+      modal.style.display = "none";
+      resolve(false);
+    };
+  });
+}

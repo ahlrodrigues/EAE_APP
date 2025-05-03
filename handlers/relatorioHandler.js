@@ -1,7 +1,8 @@
 import { renderTabela } from '../renderer/relatorio/renderTabela.js';
-import { exibirAviso } from '../renderer/ui/modalAviso.js'; // ajuste o caminho se necessário
+import { exibirAviso } from '../renderer/ui/modalAviso.js'; 
 import { inicializarBotaoExportar } from './exportarNotasHandler.js';
-import { aplicarFiltros } from '../renderer/relatorio/filtrosData.js'; // ajuste o caminho se necessário
+import { aplicarFiltros } from '../renderer/relatorio/filtrosData.js'; 
+import { inicializarAcoesNotas } from '../renderer/relatorio/acoesNotas.js';
 
 
 export function inicializarRelatorio() {
@@ -18,12 +19,12 @@ export function inicializarRelatorio() {
     }
   });
 
-  // Carrega as notas na inicialização
   window.electronAPI.listarNotas()
-      .then(arquivos => {
+    .then(arquivos => {
       console.log("📁 Arquivos encontrados:", arquivos);
       renderTabela(arquivos);
       aplicarFiltros(arquivos);
+      inicializarAcoesNotas(); 
     })
     .catch(error => {
       console.error("❌ Erro ao listar notas:", error);

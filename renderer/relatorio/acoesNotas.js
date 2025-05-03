@@ -1,6 +1,4 @@
-import { arquivos } from '../relatorio.js';
-arquivos.length = 0;
-arquivos.push(...novosArquivos);
+import { exibirAviso, exibirConfirmacao } from '../ui/modalAviso.js'; 
 
 export function inicializarAcoesNotas() {
   const btnVisualizar = document.getElementById("btnVisualizarSelecionados");
@@ -43,31 +41,34 @@ async function visualizarSelecionadas() {
 }
 
 async function excluirSelecionadas() {
+  console.log("🔴 Botão excluir clicado"); // debug
+
   const checkboxes = document.querySelectorAll(".seletor-nota:checked");
+
   if (checkboxes.length === 0) {
-    alert("Nenhuma nota selecionada para excluir.");
+    exibirAviso("Nada selecionado", "Nenhuma nota foi selecionada para exclusão.");
     return;
   }
 
-  if (!confirm("Tem certeza que deseja excluir as notas selecionadas?")) return;
-linha
+  const confirmado = await exibirConfirmacao(
+    "Confirmar exclusão",
+    "Tem certeza que deseja excluir as notas selecionadas?"
+  );
+  if (!confirmado) return;
+
   try {
     for (const checkbox of checkboxes) {
       const nomeNota = checkbox.dataset.nome;
       await window.electronAPI.excluirNota(nomeNota);
     }
 
-    // Atualizar lista após exclusão
     const novosArquivos = await window.electronAPI.listarNotas();
     const { renderTabela } = await import('./renderTabela.js');
     renderTabela(novosArquivos);
 
-
-    
-
-    alert("Notas excluídas com sucesso!");
+    exibirAviso("Sucesso", "Notas excluídas com sucesso!");
   } catch (error) {
     console.error("Erro ao excluir notas:", error);
-    alert("Erro ao excluir notas.");
+    exibirAviso("Erro", "Ocorreu um erro ao excluir as notas.");
   }
 }
