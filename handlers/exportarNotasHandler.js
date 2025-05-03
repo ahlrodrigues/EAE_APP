@@ -1,5 +1,5 @@
 import { exportarNotasSeparadas, exportarNotasUnico } from '../renderer/relatorio/exportarNotas.js';
-import { exibirAviso } from '../renderer/ui/modalAviso.js'; // ajuste o caminho conforme necessário
+import { exibirAviso } from '../renderer/ui/modalAviso.js'; 
 
 export function inicializarBotaoExportar() {
   const btnExportar = document.getElementById('btnExportarSelecionados');
@@ -41,22 +41,26 @@ export function inicializarBotaoExportar() {
   btnConfirmar.addEventListener('click', async () => {
     const selecionadas = [...document.querySelectorAll('input.seletor-nota:checked')];
     const tipo = document.querySelector('input[name="tipoExportacao"]:checked')?.value;
-
+  
     if (!selecionadas.length) {
       exibirAviso("Nada selecionado", "Selecione ao menos uma anotação para exportar.");
       return;
     }
-
+  
     modal.style.display = 'none';
-
+  
     if (tipo === 'unico') {
       await exportarNotasUnico(selecionadas);
+      exibirAviso(
+        "Anotação exportada com sucesso.",
+        "Arquivo salvo na pasta Downloads/Anotações_EAE."
+      );
     } else {
       await exportarNotasSeparadas(selecionadas);
+      exibirAviso(
+        "PDFs individuais exportados!",
+        "Verifique a pasta Downloads/Anotações_EAE."
+      );
     }
-  });
-
-  document.getElementById("fecharModalExportar")?.addEventListener("click", () => {
-    modal.style.display = "none";
   });
 }

@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   abrirVisualizacaoNotas: (html) => ipcRenderer.invoke("abrir-visualizacao-notas", html),
   enviarEmail: (dados) => ipcRenderer.invoke("enviar-email-dirigente", dado),
   gerarPdfAnexosParaEmail: (conteudos, nomes, tipo) => ipcRenderer.invoke("gerar-pdf-anexos-email", conteudos, nomes, tipo),
+  obterCadastro: () => ipcRenderer.invoke('obter-cadastro'),
   
   
 

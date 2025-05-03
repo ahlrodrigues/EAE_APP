@@ -18,10 +18,21 @@ function registrarNotasHandlers(ipcMain) {
   });
 
   ipcMain.handle('ler-nota', async (event, nome) => {
+    if (!nome || typeof nome !== 'string') {
+      console.error('❌ Nome de nota inválido em ler-nota:', nome);
+      throw new Error('Nome de nota inválido');
+    }
+  
     const filePath = path.join(getNotasPath(), nome);
-    if (!fs.existsSync(filePath)) throw new Error('Nota não encontrada');
+  
+    if (!fs.existsSync(filePath)) {
+      console.error('❌ Nota não encontrada:', filePath);
+      throw new Error('Nota não encontrada');
+    }
+  
     return fs.readFileSync(filePath, 'utf-8');
   });
+  
 }
 
 module.exports = { registrarNotasHandlers };

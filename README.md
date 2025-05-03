@@ -45,6 +45,7 @@ independente da nossa vontade.
 **Feature:**
 ------
 ```
+[ ] Editor de cadastro
 [ ] Automatizar o footer
 [X] excluir nota
 [X] Exportação das notas para PDF

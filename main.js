@@ -10,6 +10,10 @@ const notasPath = path.join(userDataPath, "notas");
 
 const { registrarHandlers } = require('./handlers');
 
+const { registrarEmailHandlers } = require('./handlers/emailHandler');
+
+
+
 function createMainWindow() {
   const win = new BrowserWindow({
     width: 1000,
@@ -107,9 +111,6 @@ ipcMain.handle("ler-usuario", async () => {
     return null;
   }
 });
-
-
-
 
 
 ipcMain.handle("armazenar-senha", async (event, senhaPura) => {

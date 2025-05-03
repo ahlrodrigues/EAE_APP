@@ -73,8 +73,8 @@ export async function exportarNotasUnico(checkboxes) {
   const nomeArquivo = `${dataStr}_${horaStr}-${nomeAluno}.pdf`;
 
   const caminho = await window.electronAPI.exportarNotas(htmlNotas, nomeArquivo);
-
 }
+
 
 export async function exportarNotasSeparadas(checkboxes) {
   for (const cb of checkboxes) {
@@ -96,5 +96,5 @@ export async function exportarNotasSeparadas(checkboxes) {
     await window.electronAPI.exportarNotas(html, nome);
   }
 
-  alert("PDFs individuais exportados na pasta Downloads/Anotações_EAE.");
 }
+

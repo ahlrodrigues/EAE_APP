@@ -1,5 +1,7 @@
 export function setupEventosEnvioEmail() {
+  console.log('setupEventosEnvioEmail foi chamado');
     document.addEventListener('click', async (event) => {
+      console.log('clique detectado:', event.target.id);
       if (event.target.id === 'btnVerEnvioEmail') {
         await visualizarNotasSelecionadas();
       } else if (event.target.id === 'btnConfirmarEnvioEmail') {
@@ -7,10 +9,22 @@ export function setupEventosEnvioEmail() {
       }
     });
   }
-  
+  setupEventosEnvioEmail();
+
+
   async function visualizarNotasSelecionadas() {
     try {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      const nomesNotas = Array.from(checkboxes)
+  .map(cb => cb.dataset.nome)
+  .filter(nome => !!nome); // Remove undefined ou string vazia
+
+if (nomesNotas.length === 0) {
+  alert('Nenhuma nota selecionada corretamente.');
+  return;
+}
+
+
       const arquivosSelecionados = Array.from(checkboxes).map(cb => cb.dataset.nome);
   
       const conteudos = await Promise.all(
@@ -30,14 +44,27 @@ export function setupEventosEnvioEmail() {
     try {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
       const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked')?.value || 'unico';
-      const nomesNotas = Array.from(checkboxes).map(cb => cb.dataset.nome);
+  
+      const nomesNotas = Array.from(checkboxes)
+        .map(cb => cb.dataset.nome)
+        .filter(nome => !!nome);
+  
+      if (nomesNotas.length === 0) {
+        alert('Nenhuma nota selecionada corretamente.');
+        return;
+      }
   
       const usuario = await window.electronAPI.obterCadastro();
+  
       const conteudos = await Promise.all(
         nomesNotas.map(nome => window.electronAPI.lerNota(nome))
       );
   
-      const anexos = await window.electronAPI.gerarPdfAnexosParaEmail(conteudos, nomesNotas, tipoEnvio);
+      const anexos = await window.electronAPI.gerarPdfAnexosParaEmail(
+        conteudos,
+        nomesNotas,
+        tipoEnvio
+      );
   
       const assunto = `EAE - Anotações de ${usuario.aluno}`;
       const corpo = `
@@ -47,6 +74,7 @@ export function setupEventosEnvioEmail() {
         Escola de Aprendizes do Evangelho
       `;
   
+      // ⬇️ Esta linha abaixo é segura e válida:
       await window.electronAPI.enviarEmail({
         para: usuario.emailDirigente,
         assunto,
@@ -61,4 +89,5 @@ export function setupEventosEnvioEmail() {
       alert('Erro ao enviar e-mail.');
     }
   }
+  
   
