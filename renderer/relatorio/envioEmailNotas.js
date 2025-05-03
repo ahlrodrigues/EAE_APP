@@ -72,9 +72,13 @@ async function enviarNotasPorEmail() {
 
     const usuario = await window.electronAPI.obterCadastro();
 
-    const conteudos = await Promise.all(
-      nomesNotas.map(nome => window.electronAPI.lerNota(nome))
-    );
+    const senha = await window.electronAPI.getSenhaUsuario();
+const conteudos = await Promise.all(
+  nomesNotas.map(async nome => {
+    const criptografado = await window.electronAPI.lerNota(nome);
+    return await window.electronAPI.descriptografar(criptografado, senha);
+  })
+);
 
     const anexos = await window.electronAPI.gerarPdfAnexosParaEmail(
       conteudos,

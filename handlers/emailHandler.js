@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
-const { BrowserWindow } = require('electron');
 const { getUserDataPath } = require('../config/paths');
+const { gerarHtmlExportacao, gerarPdfBuffer } = require('../renderer/exportacaoUtils');
 
 function registrarEmailHandlers(ipcMain) {
   ipcMain.handle('enviar-token', async (event, token) => {
@@ -10,14 +10,7 @@ function registrarEmailHandlers(ipcMain) {
     const dados = JSON.parse(fs.readFileSync(filePath));
     const emailDestino = dados.email;
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_REMETENTE,
-        pass: process.env.SENHA_REMETENTE
-      }
-    });
-
+    const transporter = criarTransportador();
     const mailOptions = {
       from: process.env.EMAIL_REMETENTE,
       to: emailDestino,
@@ -29,19 +22,12 @@ function registrarEmailHandlers(ipcMain) {
   });
 
   ipcMain.handle('enviar-email-dirigente', async (event, { para, assunto, corpo, anexos, confirmarLeitura }) => {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
-      }
-    });
-
+    const transporter = criarTransportador();
     const mailOptions = {
       from: process.env.EMAIL_REMETENTE,
       to: para,
       subject: assunto,
-      html: corpo,
+      text: corpo,
       attachments: anexos,
       headers: {
         'Disposition-Notification-To': confirmarLeitura
@@ -51,14 +37,16 @@ function registrarEmailHandlers(ipcMain) {
     await transporter.sendMail(mailOptions);
   });
 
+  
 
-
-  async function gerarPdfBuffer(html) {
-    const win = new BrowserWindow({ show: false });
-    await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-    const pdf = await win.webContents.printToPDF({});
-    win.destroy();
-    return pdf;
+  function criarTransportador() {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
   }
 }
 
