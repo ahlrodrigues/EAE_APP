@@ -47,19 +47,22 @@ independente da nossa vontade.
 ```
 [ ] Editor de cadastro
 [ ] Automatizar o footer
-[X] excluir nota
+[X] Excluir nota
 [X] Exportação das notas para PDF
-[ ] envio das notas selecionadas para o dirigente 
-[ ] importação de arquivos dos dirigentes 
+[x] Envio das notas selecionadas para o dirigente 
+[ ] Importação de imagens 
 [ ] Envio para FDJ 
 [ ] Quadro de aviso 
 [ ] Atualização via Github 
 [ ] Sobre - aviso, lgpd e licença 
 [ ] Formulário de contato
-[ ] modular css
-[ ] importar áudio / vídeo
-[ ] link para o trevo 
-[ ] mostrar canal AEE
+[ ] Modular css
+[ ] Importar áudio / vídeo
+[ ] Importação de tema.txt
+[ ] Importação de testes
+[ ] Importação de mensagens
+[ ] Link para o trevo 
+[ ] Mostrar canal AEE
 ```
 
 
