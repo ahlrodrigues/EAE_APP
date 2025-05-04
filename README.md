@@ -55,7 +55,7 @@ independente da nossa vontade.
 [ ] Quadro de aviso 
 [ ] Atualização via Github 
 [ ] Sobre - aviso, lgpd e licença 
-[ ] Formulário de contato
+[x] Formulário de contato
 [ ] Modular css
 [ ] Importar áudio / vídeo
 [ ] Importação de tema.txt

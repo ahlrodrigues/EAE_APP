@@ -122,7 +122,8 @@ ipcMain.handle("armazenar-senha", async (event, senhaPura) => {
   return true;
 });
 
-
+const setupEmailContatoHandler = require('./handlers/emailContatoHandler');
+setupEmailContatoHandler();
 
 const algorithm = 'aes-256-cbc'; // Algoritmo de criptografia
 

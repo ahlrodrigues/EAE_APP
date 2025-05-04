@@ -21,4 +21,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   gerarPdf: (html, nomeArquivo, salvarNoDisco = true) => ipcRenderer.invoke('gerar-pdf', html, nomeArquivo, salvarNoDisco),
   enviarToken: (token) => ipcRenderer.invoke('enviar-token', token),
   obterNomeAluno: () => ipcRenderer.invoke('obter-nome-aluno'),
+  enviarEmailContato: (assunto, mensagem) => ipcRenderer.invoke('enviarEmailContato', assunto, mensagem),
 });
