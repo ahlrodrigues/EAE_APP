@@ -1,58 +1,4 @@
-export function setupEventosEnvioEmail() {
-  console.log('setupEventosEnvioEmail foi chamado');
-
-  // Escuta cliques em toda a página
-  document.addEventListener('click', async (event) => {
-    const id = event.target.id;
-    console.log('🖱️ Clique detectado:', id);
-
-    if (id === 'btnVerEnvioEmail') {
-      await visualizarNotasSelecionadas();
-    } else if (id === 'btnConfirmarEnvioEmail') {
-      await enviarNotasPorEmail();
-    } else if (id === 'btnFecharModalEnvio') {
-      document.getElementById('modalEnvioEmail').style.display = 'none';
-    }
-  });
-}
-
-setupEventosEnvioEmail();
-
-async function visualizarNotasSelecionadas() {
-  try {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-    const nomesNotas = Array.from(checkboxes)
-      .map(cb => cb.dataset.nome)
-      .filter(nome => !!nome); // Remove undefined ou string vazia
-
-    if (nomesNotas.length === 0) {
-      alert('❗ Nenhuma nota selecionada corretamente.');
-      return;
-    }
-
-    console.log("📋 Notas selecionadas para visualização:", nomesNotas);
-
-    const senha = await window.electronAPI.getSenhaUsuario();
-const conteudos = await Promise.all(
-  nomesNotas.map(async (nome) => {
-    const cripto = await window.electronAPI.lerNota(nome);
-    return await window.electronAPI.descriptografar(cripto, senha);
-  })
-);
-
-
-    const htmlFinal = conteudos.map(c => `
-      <div class="notaVisualizada" style="margin-bottom:2rem; border:1px solid #ccc; padding:1rem; border-radius:8px;">
-        <pre>${c}</pre>
-      </div>
-    `).join('<hr>');
-
-    await window.electronAPI.abrirVisualizacaoNotas(htmlFinal);
-  } catch (erro) {
-    console.error('❌ Erro ao visualizar notas:', erro);
-    alert('Erro ao visualizar notas.');
-  }
-}
+import { gerarCorpoEmailDirigente, gerarCorpoEmailAluno } from '../shared/emailTemplates.js';
 
 async function enviarNotasPorEmail() {
   try {
@@ -61,24 +7,22 @@ async function enviarNotasPorEmail() {
 
     const nomesNotas = Array.from(checkboxes)
       .map(cb => cb.dataset.nome)
-      .filter(nome => !!nome);
+      .filter(Boolean);
 
     if (nomesNotas.length === 0) {
       alert('❗ Nenhuma nota selecionada corretamente.');
       return;
     }
 
-    console.log("📤 Enviando notas:", nomesNotas, "Tipo:", tipoEnvio);
-
     const usuario = await window.electronAPI.obterCadastro();
-
     const senha = await window.electronAPI.getSenhaUsuario();
-const conteudos = await Promise.all(
-  nomesNotas.map(async nome => {
-    const criptografado = await window.electronAPI.lerNota(nome);
-    return await window.electronAPI.descriptografar(criptografado, senha);
-  })
-);
+
+    const conteudos = await Promise.all(
+      nomesNotas.map(async (nome) => {
+        const cripto = await window.electronAPI.lerNota(nome);
+        return await window.electronAPI.descriptografar(cripto, senha);
+      })
+    );
 
     const anexos = await window.electronAPI.gerarPdfAnexosParaEmail(
       conteudos,
@@ -86,25 +30,42 @@ const conteudos = await Promise.all(
       tipoEnvio
     );
 
-    const assunto = `EAE - Anotações de ${usuario.aluno}`;
-    const corpo = `
-      Olá ${usuario.dirigente},<br><br>
-      Seguem em anexo as anotações do aluno(a) ${usuario.aluno}.<br><br>
-      Atenciosamente,<br>
-      Escola de Aprendizes do Evangelho
-    `;
+    const corpoDirigente = gerarCorpoEmailDirigente(usuario.dirigente, usuario.aluno, 'pt');
+    const corpoAluno = gerarCorpoEmailAluno(usuario.aluno, 'pt');
 
+    // E-mail para dirigente
     await window.electronAPI.enviarEmail({
       para: usuario.emailDirigente,
-      assunto,
-      corpo,
+      assunto: `EAE - Anotações de ${usuario.aluno}`,
+      corpo: corpoDirigente,
       anexos,
-      confirmarLeitura: usuario.email
+      confirmarLeitura: null
     });
 
-    alert('✅ E-mail enviado com sucesso!');
+    // Confirmação para aluno
+    await window.electronAPI.enviarEmail({
+      para: usuario.email,
+      assunto: 'Confirmação de envio de anotações',
+      corpo: corpoAluno,
+      anexos: [],
+      confirmarLeitura: null
+    });
+
+    alert('✅ E-mails enviados com sucesso!');
   } catch (erro) {
     console.error('❌ Erro ao enviar e-mail:', erro);
     alert('Erro ao enviar e-mail.');
   }
 }
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', (event) => {
+    if (event.target.id === 'btnConfirmarEnvioEmail') {
+      enviarNotasPorEmail();
+    }
+
+    if (event.target.id === 'btnFecharModalEnvio') {
+      const modal = document.getElementById('modalEnvioEmail');
+      if (modal) modal.style.display = 'none';
+    }
+  });
+});

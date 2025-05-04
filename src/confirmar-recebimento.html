@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Confirmação de Recebimento</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ecfae0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+    }
+
+    img {
+      max-width: 100px;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background-color: #117508;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+
+    .success {
+      color: #117508;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    .nome-aluno {
+      font-size: 1.1rem;
+      color: #444;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="/imagem/trevo.png" alt="Logo Trevo" />
+    <h2>Confirmar Recebimento</h2>
+    <p class="nome-aluno" id="nomeAlunoTexto"></p>
+    <p>Confirme abaixo que recebeu as anotações do aluno.</p>
+    <button onclick="confirmar()">✅ Confirmar Recebimento</button>
+    <div id="mensagem" class="success" style="display: none;">Confirmação enviada com sucesso ao aluno!</div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const aluno = params.get('aluno') || 'Aluno Desconhecido';
+    const email = params.get('email');
+
+    document.getElementById('nomeAlunoTexto').innerText = `Anotações de: ${aluno}`;
+
+    async function confirmar() {
+      if (!email) {
+        alert("E-mail do aluno não informado.");
+        return;
+      }
+
+      const resposta = await fetch('/api/enviar-confirmacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aluno, email })
+      });
+
+      if (resposta.ok) {
+        document.getElementById('mensagem').style.display = 'block';
+      } else {
+        alert('Erro ao enviar confirmação.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -12,6 +12,10 @@ const { registrarHandlers } = require('./handlers');
 
 const { registrarEmailHandlers } = require('./handlers/emailHandler');
 
+const { registrarGerarPdfAnexosEmailHandler } = require('./handlers/gerarPdfAnexosEmailHandler');
+registrarGerarPdfAnexosEmailHandler(ipcMain); // ← aqui sim!
+
+
 require('dotenv').config();
 
 function createMainWindow() {
@@ -251,7 +255,6 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-const { registrarGerarPdfAnexosEmailHandler } = require('./handlers/gerarPdfAnexosEmailHandler');
-registrarGerarPdfAnexosEmailHandler(ipcMain);
+
 
 
