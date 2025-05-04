@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Rodapé com Ano Dinâmico</title>
+</head>
+<body>
+  <footer>
+    <p id="anoProjeto"></p>
+  </footer>
+
+  <script>
+    const anoInicial = 2024;
+    const anoAtual = new Date().getFullYear();
+    const textoAno = anoAtual > anoInicial ? `${anoInicial} - ${anoAtual}` : `${anoInicial}`;
+    document.getElementById("anoProjeto").textContent = `© ${textoAno} - Todos os direitos reservados.`;
+  </script>
+</body>
+</html>
