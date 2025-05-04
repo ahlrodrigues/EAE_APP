@@ -96,6 +96,17 @@
 <input type="text" id="secretarios" placeholder="Nomes dos secretários" required />
 <input type="text" id="aluno" placeholder="Nome do aluno" required />
 <input type="email" id="email" placeholder="E-mail do aluno" required />
+<input type="tel" id="telefone" placeholder="Telefone com DDI e DDD(ex: +055 11 91234-5678)" required />
+
+
+<div id="modalAviso" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:2rem; border-radius:8px; max-width:400px; text-align:center;">
+    <p id="modalMensagem" style="margin-bottom:1rem;"></p>
+    <button onclick="fecharAviso()">OK</button>
+  </div>
+</div>
+
+
 
 
 

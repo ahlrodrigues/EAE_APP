@@ -18,7 +18,7 @@ registrarGerarPdfAnexosEmailHandler(ipcMain); // ← aqui sim!
 
 require('dotenv').config();
 
-function createMainWindow() {
+function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 800,
@@ -106,6 +106,7 @@ ipcMain.handle("ler-usuario", async () => {
       secretarios: dadosUsuario.secretarios,
       aluno: dadosUsuario.aluno,
       email: dadosUsuario.email,
+      telefone: dadosUsuario.telefone,
       senha: dadosUsuario.senha // bcrypt hash
     };
 
@@ -245,7 +246,7 @@ console.log("MAIN.JS - Aplicação iniciando...");
 
 app.whenReady().then(() => {
   console.log("MAIN.JS - App está pronto!");
-  createMainWindow();
+  createWindow();
   console.log("MAIN.JS - Chamando registrarHandlers...");
   registrarHandlers(ipcMain);
 });
