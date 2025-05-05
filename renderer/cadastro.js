@@ -51,6 +51,7 @@ if (!regexTelefone.test(telefone)) {
     };
 
     await window.electronAPI.salvarCadastro(dados);
+    await window.electronAPI.armazenarSenha(senha);
     await exibirAviso("Cadastro salvo com sucesso!");
     window.location.href = "login.html";
   } catch (error) {

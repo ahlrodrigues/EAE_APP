@@ -22,4 +22,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   enviarToken: (token) => ipcRenderer.invoke('enviar-token', token),
   obterNomeAluno: () => ipcRenderer.invoke('obter-nome-aluno'),
   enviarEmailContato: (assunto, mensagem) => ipcRenderer.invoke('enviarEmailContato', assunto, mensagem),
+  getSenhaCriptografia: () => ipcRenderer.invoke('get-senha-criptografia'),
+  setSenhaCriptografia: (senha) => ipcRenderer.send('set-senha-criptografia', senha),
 });

@@ -12,6 +12,7 @@ export function exibirAviso(titulo, mensagemHtml) {
   const btnFechar = document.getElementById("modalAvisoFechar");
   btnFechar?.addEventListener("click", () => {
     modal.style.display = "none";
+    location.reload();
   }, { once: true });
 }
 export function exibirConfirmacao(titulo, mensagem) {

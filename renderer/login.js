@@ -1,22 +1,30 @@
-document.getElementById("loginForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formLogin");
+  if (!form) {
+    console.error("❌ Formulário com ID 'formLogin' não encontrado.");
+    return;
+  }
 
-  const email = document.getElementById("email").value.trim();
-  const senha = document.getElementById("senha").value;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  try {
-    const valido = await window.electronAPI.validarSenhaHash(senha);
+    const email = document.getElementById("email")?.value.trim();
+    const senhaDigitada = document.getElementById("senha")?.value;
+
+    const valido = await window.electronAPI.validarSenhaHash(senhaDigitada);
 
     if (valido) {
-      window.location.href = "index.html";
+      await window.electronAPI.setSenhaCriptografia(senhaDigitada);
+      console.log("🔐 Senha enviada com sucesso ao main.js via setSenhaCriptografia()");
+      location.href = "notas.html";
     } else {
-      document.getElementById("mensagem").textContent = "Senha incorreta. Tente novamente.";
+      alert("Senha incorreta");
     }
-  } catch (error) {
-    console.error("Erro no login:", error);
-    document.getElementById("mensagem").textContent = "Erro ao validar senha.";
-  }
+  });
 });
+
+
+
 
 // ✅ Olho da senha
 document.getElementById("toggleSenha").addEventListener("click", () => {
