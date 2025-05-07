@@ -1,5 +1,5 @@
 // 🔐 preload.js — Ponte segura entre o processo renderer e o processo principal (main)
-console.log("🧠 preload.js ATIVADO!");
+try {
 
   const electron = require('electron');
   const contextBridge = electron.contextBridge;
@@ -50,6 +50,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   visualizarNota: (nome) => ipcRenderer.invoke("visualizar-nota", nome),
   listarNotas: () => ipcRenderer.invoke("listar-notas"),
   on: (canal, callback) => ipcRenderer.on(canal, callback), 
+  abrirNotaUnica: (dados) => ipcRenderer.invoke("abrirNotaUnica", dados),
+  notifyReady: () => ipcRenderer.send("nota-ready"),
 });
 
-
+console.log("✅ preload.js carregado com sucesso");
+} catch (e) {
+  console.error("❌ Erro no preload.js:", e);
+}

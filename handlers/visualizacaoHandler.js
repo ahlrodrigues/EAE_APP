@@ -7,6 +7,7 @@ function registrarVisualizacaoHandler(ipcMain) {
       height: 600,
       title: 'Visualização das Notas',
       webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
         contextIsolation: true
       }
     });

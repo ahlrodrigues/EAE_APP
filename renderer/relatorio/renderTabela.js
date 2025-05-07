@@ -1,4 +1,6 @@
 // 📋 Renderiza dinamicamente a tabela de notas no relatório
+import { exibirAviso } from "../ui/modalAviso.js";
+
 export async function renderizarTabela(lista) {
   console.log("🚀 renderTabela chamada!");
 
@@ -25,6 +27,7 @@ export async function renderizarTabela(lista) {
       }
     
       const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senha);
+      console.log(`📄 Conteúdo descriptografado da nota ${nome}:\n${conteudo}`);
       tr.dataset.conteudo = conteudo;
     } catch (erro) {
       console.error(`❌ Erro ao carregar ${nome}:`, erro);
@@ -99,7 +102,10 @@ async function visualizarNota(nome) {
     localStorage.setItem("conteudoCriptografado", conteudoCriptografado);
     localStorage.setItem("dataNota", formatarDataBrasileira(nome.substring(0, 10)));
 
-    window.open("nota.html", "_blank");
+    await window.electronAPI.abrirNotaUnica({
+      conteudo: conteudoCriptografado,
+      senha: senhaNota
+    });
   } catch (err) {
     console.error("❌ Erro ao abrir nota:", err);
     exibirAviso("Erro", "Erro ao abrir a nota.");

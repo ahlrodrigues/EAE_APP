@@ -1,146 +1,53 @@
-document.addEventListener("DOMContentLoaded", () => {
+console.log("🚀 nota.js carregado!");
+
+import { gerarNomeNota } from "./gerarNomeNota.js";
+import { exibirAviso } from "./ui/modalAviso.js";
+import { visualizarNota } from "../renderer/shared/visualizarNota.js";
+
+// ✅ Formata data de YYYY-MM-DD → DD-MM-YYYY
+function formatarDataTexto(conteudo) {
+  return conteudo.replace(/^Data:\s*(\d{4})-(\d{2})-(\d{2})/m, "Data: $3-$2-$1");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("📦 DOM totalmente carregado");
+
   const container = document.getElementById("conteudoNota");
   const titulo = document.getElementById("tituloNota");
-  const urlParams = new URLSearchParams(window.location.search);
-  const multi = urlParams.get("multi");
 
-  // Função utilitária para formatar datas no corpo da nota
-  function formatarDataTexto(texto) {
-    return texto.replace(
-      /^Data:\s*(\d{4})-(\d{2})-(\d{2})/m,
-      (_, ano, mes, dia) => `Data: ${dia}-${mes}-${ano}`
-    );
-  }
-
-  // ✅ Diagnóstico inicial
-  console.group("🧪 Diagnóstico preload / electronAPI");
-  console.log("🔍 window.electronAPI =", window.electronAPI);
-  console.log("🔍 typeof electronAPI.descriptografar =", typeof window.electronAPI?.descriptografar);
-  console.groupEnd();
-
-  // 🚨 Verificação crítica: preload.js corretamente exposto?
-  if (!window.electronAPI || typeof window.electronAPI.descriptografar !== "function") {
-    container.textContent = "Erro crítico: integração com Electron falhou.";
-    console.error("❌ 'descriptografar' não está disponível no preload.");
+  if (!container) {
+    console.error("❌ Elemento 'conteudoNota' não encontrado no DOM.");
     return;
   }
 
-  if (multi === "true") {
-    // ✅ VISUALIZAÇÃO MULTI-NOTAS
-    console.log("📂 Modo multi-notas ativado (multi=true)");
-    titulo.textContent = "Notas Selecionadas";
+  // ✅ Envia evento ao main indicando que estamos prontos (se suportado)
+  window.electronAPI?.notifyReady?.();
 
-    const lista = JSON.parse(localStorage.getItem("notasSelecionadas"));
-    if (!lista || !Array.isArray(lista)) {
-      console.warn("⚠️ Nenhuma nota encontrada no localStorage.");
-      container.textContent = "Nenhuma nota encontrada.";
-      return;
-    }
+  // ✅ Escuta os dados enviados via IPC após abertura da nota
+  window.electronAPI.on("dados-da-nota", async (_, { conteudo, senha }) => {
+    console.log("📨 Dados recebidos:", {
+      senha,
+      inicioCriptografado: conteudo.substring(0, 30),
+    });
 
-    container.innerHTML = lista.map(n => {
-      const conteudo = n.conteudo || "";
-      const conteudoFormatado = formatarDataTexto(conteudo);
+    try {
+      const conteudoDescriptografado = await window.electronAPI.descriptografar(conteudo, senha);
+      const formatado = formatarDataTexto(conteudoDescriptografado);
 
-      return `
-        <div style="
-          background: white;
-          padding: 1.5rem;
-          border-radius: 12px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          margin-bottom: 2rem;
-          text-align: left;
-        ">
-          <img src="../assets/trevo.png" alt="Logo Trevo"
-               style="display: block; margin: 0 auto 1rem auto; max-width: 100px;" />
-          <pre style="
-            background: #f9f9f9;
-            padding: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            font-size: 1rem;
-            color: #333;
-          ">${conteudoFormatado}</pre>
+      
+      container.innerHTML = `
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 2rem; text-align: left;">
+          <img src="../assets/trevo.png" alt="Logo Trevo" style="display: block; margin: 0 auto 1rem auto; max-width: 80px;" />
+          <pre style="background: #f9f9f9; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; white-space: pre-wrap; font-size: 1rem; color: #333;">
+${formatado}
+          </pre>
         </div>
       `;
-    }).join("");
+    } catch (erro) {
+      console.error("❌ Falha ao descriptografar nota:", erro);
+      container.innerHTML = "<p>Erro ao descriptografar a nota.</p>";
+    }
+  });
 
-  } else {
-    // ✅ VISUALIZAÇÃO ÚNICA COM DESCRIPTOGRAFIA
-    console.log("📄 Modo nota única ativado (multi=false)");
 
-    window.electronAPI.on("dados-da-nota", async (_, { conteudo, senha }) => {
-      const container = document.getElementById("conteudoNota");
-      const titulo = document.getElementById("tituloNota");
-    
-      try {
-        const conteudoDescriptografado = await window.electronAPI.descriptografar(conteudo, senha);
-        const formatado = formatarDataTexto(conteudoDescriptografado);
-
-    titulo.textContent = "Nota Selecionada";
-
-    container.innerHTML = `
-      <div style="
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-        text-align: left;
-      ">
-        <img src="../assets/trevo.png" alt="Logo Trevo"
-             style="display: block; margin: 0 auto 1rem auto; max-width: 80px;" />
-        <pre style="
-          background: #f9f9f9;
-          padding: 1rem;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          white-space: pre-wrap;
-          font-size: 1rem;
-          color: #333;
-        ">Carregando...</pre>
-      </div>
-    `;
-  } catch (erro) {
-    console.error("❌ Falha ao descriptografar:", erro);
-    container.textContent = "Erro ao descriptografar a nota.";
-  }
-});
-    // 🔐 Descriptografa e renderiza a nota
-    (async () => {
-      try {
-        console.log("▶️ Chamando descriptografar com:", senha, conteudoCriptografado);
-        const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senha);
-        const conteudoFormatado = formatarDataTexto(conteudo);
-
-        console.log("✅ Conteúdo descriptografado:", conteudoFormatado?.substring(0, 150) || "[vazio]");
-
-        container.innerHTML = `
-          <div style="
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-            text-align: left;
-          ">
-            <img src="../assets/trevo.png" alt="Logo Trevo"
-                 style="display: block; margin: 0 auto 1rem auto; max-width: 80px;" />
-            <pre style="
-              background: #f9f9f9;
-              padding: 1rem;
-              border: 1px solid #ccc;
-              border-radius: 8px;
-              white-space: pre-wrap;
-              font-size: 1rem;
-              color: #333;
-            ">${conteudoFormatado}</pre>
-          </div>
-        `;
-      } catch (erro) {
-        console.error("❌ Falha ao descriptografar:", erro);
-        container.textContent = "Erro ao descriptografar a nota.";
-      }
-    })();
-  }
 });

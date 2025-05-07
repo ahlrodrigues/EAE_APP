@@ -141,6 +141,10 @@ let notaWin = null;
     });
   }
   
+  // Botão ver nota
+  const { registrarAbrirNotaUnicaHandler } = require("./handlers/abrirNotaUnica.js");
+registrarAbrirNotaUnicaHandler();
+
 
   // Decide qual página inicial carregar
   if (fs.existsSync(usuarioPath)) {
