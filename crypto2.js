@@ -1,6 +1,6 @@
 const { descriptografar } = require('./lib/crypto');
 // Copie exatamente o conteúdo da nota criptografada aqui (do arquivo .txt)
-const conteudoCriptografado = 'TMNPOaqs3x7W1BzIY+Z0HA==:dYQK1SAKhI4XUWSefn8+qXiFwuFFvTEz2hAuJ8H7j9+K9OztRghv2lfBM2R1F/mjiLcNOOY2gDBlbtQEaDBB7Fttybwr1OaSV0EtQZNn/6dtcDGKYnbHk01M6LaWGsrYTKfTCKsZVm2OrxY6jcyvZHqy8IoynHaMGGxYwgR+M2ZSaM6/95AmIVfpxrFW/BFa';
+const conteudoCriptografado = '/EUL5DHdatciHokafz2q5g==:Y70PIRGB2AB/V4BgM4a3fDBuVYtIKQ8rXxaa/hux34gsPmj3ftnatD/PyZLfAe/eDfpHRJ4V8I3p0QVNyYzWdyshXrFeg7Jp0y4klTQ06ovoT1boaL2Yj+LX3Nl21Ttx1iiaqWpQlg9Y9LL9i9DT8j3z7OC4Y5q4BuDIKJlTv5Q=';
 // Coloque aqui a senha que você usou para criptografar essa nota
 const senha = '&ntu$1@$M0';
 

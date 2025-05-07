@@ -1,5 +1,5 @@
 console.log("MAIN.JS - Aplicação iniciando...");
-
+console.log("🧠 main.js ATIVO! Caminho:", __filename);
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -35,9 +35,13 @@ ipcMain.handle("armazenar-senha", async (_, senhaPura) => {
   return true;
 });
 
-// 🔓 Criptografia/descriptografia
+// Declarando as funcçõe dos modulos
 ipcMain.handle("criptografar", async (_, texto, senha) => criptografar(texto, senha));
-ipcMain.handle("descriptografar", async (_, texto, senha) => descriptografar(texto, senha));
+
+
+ipcMain.handle('descriptografar', async (_, texto, senha) => {
+  return descriptografar(texto, senha);
+});
 
 // 👤 Usuário
 ipcMain.handle("ler-usuario", async () => {
@@ -107,8 +111,8 @@ ipcMain.handle('exportar-notas', async (_, conteudoHTML, nomeArquivo = 'Notas_EA
   return caminhoFinal;
 });
 
-// 🌐 Inicialização
-let mainWindow;
+
+const listarNotas = require('./renderer/listarNotas'); // CommonJS
 
 function createWindow() {
   if (!fs.existsSync(configPath)) fs.mkdirSync(configPath, { recursive: true });
@@ -125,6 +129,18 @@ function createWindow() {
 
   mainWindow.maximize();
   mainWindow.show();
+
+let notaWin = null;
+
+  if (notaWin) {
+    notaWin.webContents.once('did-finish-load', () => {
+      notaWin.webContents.send('dados-da-nota', {
+        conteudo,
+        senha
+      });
+    });
+  }
+  
 
   // Decide qual página inicial carregar
   if (fs.existsSync(usuarioPath)) {
@@ -145,6 +161,7 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
 
 // 🚀 Inicialização do app
 app.whenReady().then(() => {

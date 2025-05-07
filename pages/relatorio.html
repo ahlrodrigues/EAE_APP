@@ -1,211 +1,274 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Relatório de anotações</title>
-<style>
-body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
-.container { max-width: 960px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-header { text-align: center; margin-bottom: 1rem; }
-header img { max-width: 100px; margin-bottom: 1rem; }
-header h1 { margin: 0; color: #333; }
-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
-th { background-color: #0077cc; color: white; }
-tr:hover { background-color: #f9f9f9; }
-button { padding: 0.5rem 1rem; background-color: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
-button:hover { background-color: #005fa3; }
-.acoes-multiplas { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
-footer { text-align: center; margin-top: 2rem; padding: 1rem; font-size: 0.85rem; color: #555; }
-.filtro { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; justify-content: flex-end; }
-.filtro input[type="date"] { padding: 0.4rem 0.6rem; font-size: 1rem; }
-.nota-cartao { border:1px solid #ccc; border-radius:8px; margin:1rem 0; padding:1rem; background:#f9f9f9; page-break-inside: avoid; }
-.nota-campo { margin-bottom: 0.8rem; }
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+  <meta charset="UTF-8" />
+  <title>Relatório de Anotações - Escola de Aprendizes do Evangelho</title>
+  <style>
+    /* Estilos visuais - mantidos e organizados */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    header img {
+      max-width: 100px;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      margin: 0;
+      color: #333;
+    }
+    .filtro {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .filtro input[type="date"] {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+    }
+    .acoes-multiplas {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .nota-cartao {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #f9f9f9;
+      page-break-inside: avoid;
+    }
+    .nota-campo {
+      margin-bottom: 0.8rem;
+    }
 
-.modal-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 400px;
-  text-align: center;
-}
+    /* Modais */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
 
-.modal-botoes {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: 1.5rem;
-}
+    .modal-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 400px;
+      text-align: center;
+    }
 
-.modal-botoes button {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
+    .modal-botoes {
+      display: flex;
+      justify-content: space-evenly;
+      margin-top: 1.5rem;
+    }
 
-.modal-botoes .btnSim {
-  background-color: #28a745;
-  color: white;
-}
+    .modal-botoes button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
 
-.modal-botoes .btnNao {
-  background-color: #dc3545;
-  color: white;
-}
-#modalEnvioConteudo ul {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #f9f9f9;
-  padding: 0.5rem 0.5rem 0.5rem 1rem;
-  list-style: none;
-}
+    .modal-botoes .btnSim {
+      background-color: #28a745;
+      color: white;
+    }
 
-</style>
+    .modal-botoes .btnNao {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    #modalEnvioConteudo ul {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f9f9f9;
+      padding: 0.5rem 1rem;
+      list-style: none;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-<header>
-<img src="../assets/trevo.png" alt="Logo Trevo" />
-<h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
-</header>
-<div class="filtro">
-<label for="dataInicio">De:</label><input type="date" id="dataInicio" />
-<label for="dataFim">Até:</label><input type="date" id="dataFim" />
-</div>
-<div class="acoes-multiplas">
-<button id="btnVisualizarSelecionados">Ver Selecionadas</button>
-<button id="btnExportarSelecionados">Exportar</button>
-<button id="btnEnviarEmailDirigente">Enviar para Dirigente</button>
-<button id="btnExcluirSelecionados">Excluir</button>
-</div>
-<!-- Modal de exportação -->
-<div id="modalExportar" style="display:none; position:fixed; inset:0; background-color:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:white; padding:2rem; border-radius:12px; max-width:400px; text-align:center; position:relative;">
+  <div class="container">
+    <header>
+      <img src="../assets/trevo.png" alt="Logo Trevo" />
+      <h1>ESCOLA DE APRENDIZES DO EVANGELHO</h1>
+    </header>
 
-    <h3 id="tituloExportar">Exportar Notas Selecionadas</h3>
-    <p id="textoExportar">Como deseja exportar as notas selecionadas?</p>
-
-    <div id="opcoesExportacao" style="text-align:left; margin: 1rem 0;">
-      <label><input type="radio" name="tipoExportacao" value="unico"> Gerar um único PDF</label><br/>
-      <label><input type="radio" name="tipoExportacao" value="separado" checked> Gerar PDFs separados</label>
+    <div class="filtro">
+      <label for="dataInicio">De:</label><input type="date" id="dataInicio" />
+      <label for="dataFim">Até:</label><input type="date" id="dataFim" />
     </div>
 
-    <div style="display: flex; justify-content: center; gap: 1rem;">
-      <button id="confirmarExportacao">Confirmar Exportação</button>
-      <button id="fecharModalExportar">Fechar</button>
+    <div class="acoes-multiplas">
+      <button id="btnVisualizarSelecionados">Ver Selecionadas</button>
+      <button id="btnExportarSelecionados">Exportar</button>
+      <button id="btnEnviarEmailDirigente">Enviar para Dirigente</button>
+      <button id="btnExcluirSelecionados">Excluir</button>
     </div>
 
+    <table id="tabelaNotas">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selecionarTodas" /></th>
+          <th>#</th>
+          <th>Data</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-</div>
-  <!-- Modal para escolha ou alerta -->
-<div id="modalEnvioEmail" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
-<div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; text-align: center;">
-  <div id="modalEnvioConteudo">
-    <!-- Conteúdo será preenchido dinamicamente -->
-  </div>
-  <br>
-  <button id="btnFecharModalEnvio">Fechar</button>
-</div>
-</div>
-<table id="tabelaNotas">
-<thead>
-<tr>
-<th><input type="checkbox" id="selecionarTodas" /></th>
-<th>#</th>
-<th>Data</th>
-<th>Ações</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-<!-- Modal de aviso genérico (padrão para exibirAviso) -->
-<div id="modalAviso" style="display:none; position:fixed; inset:0; background-color:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:white; padding:2rem; border-radius:12px; max-width:400px; text-align:center;">
-    <h3 id="modalAvisoTitulo">Aviso</h3>
-    <p id="modalAvisoTexto">Mensagem padrão</p>
-    <button id="modalAvisoFechar">Fechar</button>
-  </div>
-</div>
-<!-- Modal visual de confirmação -->
-<div id="modalConfirmacaoPadrao" class="modal-overlay" style="display: none;">
-  <div class="modal-box">
-    <h2 class="titulo">Confirmar ação</h2>
-    <p class="mensagem">Tem certeza que deseja continuar?</p>
-    <div class="modal-botoes">
-      <button class="btnSim">Sim</button>
-      <button class="btnNao">Cancelar</button>
+
+  <!-- Modal de aviso genérico -->
+  <div id="modalAviso" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3 id="modalAvisoTitulo">Aviso</h3>
+      <p id="modalAvisoTexto">Mensagem padrão</p>
+      <button id="modalAvisoFechar">Fechar</button>
     </div>
   </div>
-</div>
 
-<footer>Relatório local — Escola de Aprendizes do Evangelho — 2025</footer>
-<script type="module" src="../renderer/relatorio.js"></script>
-<script type="module" src="../renderer/relatorio/envioEmailNotas.js"></script>
-<script>
-  const btnEnviarEmail = document.getElementById('btnEnviarEmailDirigente');
-  const modalConteudo = document.getElementById('modalEnvioConteudo');
-  const btnFecharModal = document.getElementById('btnFecharModalEnvio');
+  <!-- Modal de confirmação -->
+  <div id="modalConfirmacaoPadrao" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h2 class="titulo">Confirmar ação</h2>
+      <p class="mensagem">Tem certeza que deseja continuar?</p>
+      <div class="modal-botoes">
+        <button class="btnSim">Sim</button>
+        <button class="btnNao">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
-  btnEnviarEmail.addEventListener('click', () => {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+  <!-- Modal de exportação -->
+  <div id="modalExportar" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3 id="tituloExportar">Exportar Notas Selecionadas</h3>
+      <p id="textoExportar">Como deseja exportar as notas selecionadas?</p>
+      <div id="opcoesExportacao" style="text-align:left; margin: 1rem 0;">
+        <label><input type="radio" name="tipoExportacao" value="unico"> Gerar um único PDF</label><br/>
+        <label><input type="radio" name="tipoExportacao" value="separado" checked> Gerar PDFs separados</label>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 1rem;">
+        <button id="confirmarExportacao">Confirmar Exportação</button>
+        <button id="fecharModalExportar">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de envio de e-mail -->
+  <div id="modalEnvioEmail" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="width: 90%; max-width: 500px;">
+      <div id="modalEnvioConteudo"></div>
+      <br />
+      <button id="btnFecharModalEnvio">Fechar</button>
+    </div>
+  </div>
+
+  <footer>Relatório local — Escola de Aprendizes do Evangelho — 2025</footer>
+
+  <!-- Scripts -->
+  <script type="module" src="../renderer/relatorio.js"></script>
+  <script type="module" src="../renderer/relatorio/envioEmailNotas.js"></script>
+  <script>
+    // Modal de envio de email (com visual elegante)
+    const btnEnviarEmail = document.getElementById('btnEnviarEmailDirigente');
     const modal = document.getElementById('modalEnvioEmail');
     const modalConteudo = document.getElementById('modalEnvioConteudo');
-  
-    if (!modal) {
-      console.error("❌ Modal não encontrado!");
-      return;
-    }
-  
-    if (checkboxes.length === 0) {
-      modalConteudo.innerHTML = `
-        <p><strong>Nenhuma anotação foi selecionada.</strong></p>
-        <p>Por favor, selecione ao menos uma anotação para continuar.</p>
-      `;
-    } else {
-      const nomesNotasSelecionadas = [...checkboxes]
-        .map(cb => cb.dataset.nome )
-        .filter(Boolean);
-  
-        function formatarNomeNotaElegante(nomeArquivo) {
-          const [ano, mes, dia, hora, minuto, segundo, ...nomePartes] = nomeArquivo
-            .replace('.txt', '')
-            .split(/[_-]/);
-          const nomeAluno = nomePartes.join(' ').trim();
-          return `${dia}/${mes}/${ano} às ${hora}:${minuto} — ${nomeAluno}`;
-        }
-        
-        const listaNotasHtml = nomesNotasSelecionadas
-          .map(nome => `<li>${formatarNomeNotaElegante(nome)}</li>`)
-          .join('');
-  
+
+    btnEnviarEmail?.addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      modal.style.display = 'flex';
+
+      if (checkboxes.length === 0) {
+        modalConteudo.innerHTML = `
+          <p><strong>Nenhuma anotação foi selecionada.</strong></p>
+          <p>Por favor, selecione ao menos uma anotação para continuar.</p>
+        `;
+        return;
+      }
+
+      const nomesNotasSelecionadas = [...checkboxes].map(cb => cb.dataset.nome).filter(Boolean);
+
+      const listaNotasHtml = nomesNotasSelecionadas.map(nome => {
+        const partes = nome.replace('.txt', '').split(/[_-]/);
+        const [ano, mes, dia, hora, minuto, segundo, ...nomeAluno] = partes;
+        return `<li>${dia}/${mes}/${ano} às ${hora}:${minuto} — ${nomeAluno.join(' ')}</li>`;
+      }).join('');
+
       modalConteudo.innerHTML = `
         <p><strong>Você selecionou ${nomesNotasSelecionadas.length} anotações:</strong></p>
-        <ul>
-          ${listaNotasHtml}
-        </ul>
+        <ul>${listaNotasHtml}</ul>
         <p>Como deseja enviar as anotações?</p>
         <label><input type="radio" name="tipoEnvio" value="unico" checked> Enviar em um único PDF</label><br><br>
         <label><input type="radio" name="tipoEnvio" value="separado"> Enviar como arquivos separados</label><br><br>
         <button id="btnConfirmarEnvioEmail">Enviar Agora</button>
       `;
-    }
-  
-    modal.style.display = 'flex';
-  });
-  
-</script>
+    });
+
+    document.getElementById('btnFecharModalEnvio')?.addEventListener('click', () => {
+      document.getElementById('modalEnvioEmail').style.display = 'none';
+    });
+  </script>
+</body>
+</html>

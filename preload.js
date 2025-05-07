@@ -1,12 +1,34 @@
-const { contextBridge, ipcRenderer } = require('electron');
+// 🔐 preload.js — Ponte segura entre o processo renderer e o processo principal (main)
+console.log("🧠 preload.js ATIVADO!");
 
-contextBridge.exposeInMainWorld('electronAPI', {
+  const electron = require('electron');
+  const contextBridge = electron.contextBridge;
+  const ipcRenderer = electron.ipcRenderer;
+
+ 
+// ✅ Expondo métodos seguros no objeto global window.electronAPI
+contextBridge.exposeInMainWorld("electronAPI", {
+  
+  // 🔑 Recupera a senha de criptografia armazenada no main
+  getSenhaCriptografia: () => ipcRenderer.invoke("get-senha-criptografia"),
+
+
+  // 📖 Lê o conteúdo criptografado de uma nota pelo nome do arquivo
+  lerNota: (nome) => ipcRenderer.invoke("ler-nota", nome),
+
+  // 🔓 Descriptografa o conteúdo usando a senha informada
+  descriptografar: (texto, senha) => ipcRenderer.invoke("descriptografar", texto, senha),
+
+  // 📤 Solicita ao main que abra a janela de nota única com preload aplicado
+  abrirNotaUnica: () => ipcRenderer.invoke("abrirNotaUnica"),
+
+  // (opcional) Você pode adicionar outros métodos de exportação aqui
+
   salvarCadastro: (dados) => ipcRenderer.invoke('salvar-cadastro', dados),
   salvarNota: (nome, conteudo) => ipcRenderer.invoke('salvar-nota', nome, conteudo),
-  listarNotas: () => ipcRenderer.invoke('listar-notas'),
-  lerNota: (nome) => ipcRenderer.invoke('ler-nota', nome),
+ // lerNota: (nome) => ipcRenderer.invoke('ler-nota', nome),
   criptografar: (texto, senha) => ipcRenderer.invoke('criptografar', texto, senha),
-  descriptografar: (conteudo, senha) => ipcRenderer.invoke('descriptografar', conteudo, senha),
+  //descriptografar: (texto, senha) => ipcRenderer.invoke("descriptografar", texto, senha),
   getSenhaUsuario: () => ipcRenderer.invoke('get-senha-usuario'),
   armazenarSenha: (senha) => ipcRenderer.invoke('armazenar-senha', senha),
   lerUsuario: () => ipcRenderer.invoke('ler-usuario'),
@@ -22,6 +44,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   enviarToken: (token) => ipcRenderer.invoke('enviar-token', token),
   obterNomeAluno: () => ipcRenderer.invoke('obter-nome-aluno'),
   enviarEmailContato: (assunto, mensagem) => ipcRenderer.invoke('enviarEmailContato', assunto, mensagem),
-  getSenhaCriptografia: () => ipcRenderer.invoke('get-senha-criptografia'),
+ // getSenhaCriptografia: () => ipcRenderer.invoke('get-senha-criptografia'),
   setSenhaCriptografia: (senha) => ipcRenderer.send('set-senha-criptografia', senha),
+  abrirNotaMulti: () => ipcRenderer.invoke("abrir-nota-multi"),
+  visualizarNota: (nome) => ipcRenderer.invoke("visualizar-nota", nome),
+  listarNotas: () => ipcRenderer.invoke("listar-notas"),
+  on: (canal, callback) => ipcRenderer.on(canal, callback), 
 });
+
+

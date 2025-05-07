@@ -16,15 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (valido) {
       await window.electronAPI.setSenhaCriptografia(senhaDigitada);
       console.log("🔐 Senha enviada com sucesso ao main.js via setSenhaCriptografia()");
-      location.href = "notas.html";
+      location.href = "index.html";
     } else {
       alert("Senha incorreta");
     }
   });
 });
-
-
-
 
 // ✅ Olho da senha
 document.getElementById("toggleSenha").addEventListener("click", () => {

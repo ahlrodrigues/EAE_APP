@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "App com cadastro local via Electron",
   "main": "main.js",
+  
   "scripts": {
     "start": "electron --no-warnings .",
     "start:dev": "NODE_ENV=development electron --no-warnings ."
@@ -17,4 +18,5 @@
     "validator": "^13.9.0",
     "zxcvbn": "^4.4.2"
   }
+
 }

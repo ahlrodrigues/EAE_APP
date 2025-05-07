@@ -1,3 +1,3 @@
-import { inicializarRelatorio } from '../handlers/relatorioHandler.js';
+import { inicializarRelatorio } from './relatorio/relatorioHandler.js';
 
-document.addEventListener("DOMContentLoaded", inicializarRelatorio);
+document.addEventListener('DOMContentLoaded', inicializarRelatorio);

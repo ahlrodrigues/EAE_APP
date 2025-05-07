@@ -42,7 +42,7 @@ function registrarAuthHandlers(ipcMain) {
       console.error('Erro ao validar senha:', err.message);
       return { sucesso: false, mensagem: err.message };
     }
-  
-});
+  }); // ← faltava esse fechamento aqui!
 }
+
 module.exports = { registrarAuthHandlers };

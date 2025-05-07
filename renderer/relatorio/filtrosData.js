@@ -1,4 +1,4 @@
-import { renderTabela } from './renderTabela.js';
+import { renderizarTabela } from './renderTabela.js';
 
 export function aplicarFiltros(listaOriginal) {
   const dataInicioInput = document.getElementById("dataInicio");
@@ -18,7 +18,7 @@ export function aplicarFiltros(listaOriginal) {
       });
     }
 
-    renderTabela(listaFiltrada);
+    renderizarTabela(listaFiltrada);
   }
 
   if (dataInicioInput) dataInicioInput.addEventListener("change", filtrarNotas);

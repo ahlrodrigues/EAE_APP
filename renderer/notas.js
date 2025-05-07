@@ -122,24 +122,4 @@ Proposta renovadora: ${proposta}
   });
 }
 
-async function visualizarNota(nome) {
-  const senhaNota = await window.electronAPI.getSenhaCriptografia();
-  if (!senhaNota) {
-    exibirAviso("Senha não carregada. Faça login novamente.");
-    return;
-  }
-
-  try {
-    const conteudoCriptografado = await window.electronAPI.lerNota(nome);
-    const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senhaNota);
-
-    const partes = nome.substring(0, 10).split("-");
-    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-
-    localStorage.setItem("notaSelecionada", JSON.stringify({ data: dataFormatada, conteudo }));
-    window.open("nota.html", "_blank");
-  } catch (error) {
-    console.error("❌ Erro ao visualizar nota:", error);
-    exibirAviso("Erro ao abrir a nota.");
-  }
-}
+import { visualizarNota } from '../renderer/shared/visualizarNota.js';

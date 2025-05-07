@@ -45,8 +45,7 @@ async function visualizarSelecionadas() {
   await exibirAviso("Notas selecionadas", `<ul style="text-align:left">${nomesLidos}</ul>`);
 
   localStorage.setItem("notasSelecionadas", JSON.stringify(selecionadas));
-  window.open("nota.html?multi=true", "_blank");
-}
+  await window.electronAPI.abrirNotaMulti();}
 
 
 async function excluirSelecionadas() {
@@ -72,8 +71,8 @@ async function excluirSelecionadas() {
     }
 
     const novosArquivos = await window.electronAPI.listarNotas();
-    const { renderTabela } = await import('./renderTabela.js');
-    renderTabela(novosArquivos);
+    const { renderizarTabela} = await import('./renderTabela.js');
+    renderizarTabela(novosArquivos);
 
     exibirAviso("Sucesso", "Notas excluídas com sucesso!");
   } catch (error) {

@@ -1,97 +1,107 @@
-export async function renderTabela(lista) {
+// 📋 Renderiza dinamicamente a tabela de notas no relatório
+export async function renderizarTabela(lista) {
   console.log("🚀 renderTabela chamada!");
+
   const tabela = document.querySelector("#tabelaNotas tbody");
   if (!tabela) return;
 
-  tabela.innerHTML = "";
+  tabela.innerHTML = ""; // limpa a tabela antes de renderizar novamente
 
-  for (const [index, nome] of lista.entries()) {
+  for (const [index, nota] of lista.entries()) {
+    const nome = nota.nomeArquivo;
     const tr = document.createElement("tr");
     tr.dataset.nome = nome;
-
+  
     try {
-      const senha = await window.electronAPI.getSenhaUsuario();
+      const senha = await window.electronAPI.getSenhaCriptografia();
       const conteudoCriptografado = await window.electronAPI.lerNota(nome);
+    
+      console.log(`🔐 Tentando descriptografar: ${nome}`);
+      console.log("Senha usada:", senha);
+      console.log("Criptografado:", conteudoCriptografado.slice(0, 100)); // mostra só início p/ evitar poluir o log
+    
+      if (!senha) {
+        throw new Error("Senha de descriptografia não carregada");
+      }
+    
       const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senha);
       tr.dataset.conteudo = conteudo;
     } catch (erro) {
-      console.error(`Erro ao carregar conteúdo da nota ${nome}:`, erro);
-      tr.dataset.conteudo = "[Erro ao carregar]";
+      console.error(`❌ Erro ao carregar ${nome}:`, erro);
+      tr.dataset.conteudo = "[Erro ao carregar nota]";
     }
-
-    const checkboxes = document.querySelectorAll('input.seletor-nota[type="checkbox"]:checked');
-    const tdCheckbox = document.createElement("td");
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.classList.add("seletor-nota");
-  checkbox.dataset.nome = nome;
-  tdCheckbox.appendChild(checkbox);
-
-  console.log("✅ Checkbox criado com classe:", checkbox.className);
   
+    // Checkbox
+    const tdCheckbox = document.createElement("td");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("seletor-nota");
+    checkbox.dataset.nome = nome;
+    tdCheckbox.appendChild(checkbox);
+  
+    // Índice
     const tdIndex = document.createElement("td");
     tdIndex.textContent = index + 1;
-
+  
+    // Data
     const tdData = document.createElement("td");
-    const dataBruta = nome.substring(0, 10);
-    tdData.textContent = formatarData(dataBruta);
-
+    tdData.textContent = formatarDataBrasileira(nota.data);
+  
+    // Botão
     const tdAcoes = document.createElement("td");
     const btnVer = document.createElement("button");
     btnVer.textContent = "Ver nota";
-    btnVer.onclick = () => visualizarNota(nome);
+    btnVer.onclick = () => visualizarNota(nota.nomeArquivo);
     tdAcoes.appendChild(btnVer);
-
+  
     tr.appendChild(tdCheckbox);
     tr.appendChild(tdIndex);
     tr.appendChild(tdData);
     tr.appendChild(tdAcoes);
-
     tabela.appendChild(tr);
   }
+  
 
-  // ✅ Reaplicar o listener do "Selecionar todas"
+  // ✅ Reaplica o listener do "Selecionar Todas" após renderização
   requestAnimationFrame(() => {
     const masterCheckbox = document.getElementById("selecionarTodas");
     if (masterCheckbox) {
       masterCheckbox.addEventListener("change", () => {
         const checked = masterCheckbox.checked;
         const checkboxes = document.querySelectorAll("input.seletor-nota");
-        console.log(`☑️ Selecionando ${checkboxes.length} notas`);
-        checkboxes.forEach(cb => {
-          cb.checked = checked;
-          console.log(" →", cb.dataset.nome, "=", cb.checked);
-        });
+        checkboxes.forEach(cb => (cb.checked = checked));
+        console.log(`☑️ Marcando ${checkboxes.length} notas como:`, checked);
       });
     } else {
-      console.warn("⚠️ Master checkbox não encontrado após renderTabela.");
+      console.warn("⚠️ Master checkbox não encontrado.");
     }
   });
 }
 
-function formatarData(dataStr) {
+// 🗓️ Converte data YYYY-MM-DD para DD/MM/YYYY
+function formatarDataBrasileira(dataStr) {
   const [ano, mes, dia] = dataStr.split("-");
-  return `${dia}-${mes}-${ano}`;
+  return `${dia}/${mes}/${ano}`;
 }
 
+// 👁️ Abre a nota em nova janela e armazena os dados no localStorage
 async function visualizarNota(nome) {
-  const senhaNota = await window.electronAPI.getSenhaUsuario();
+  const senhaNota = await window.electronAPI.getSenhaCriptografia();
   if (!senhaNota) {
-    alert("Senha não carregada. Faça login novamente.");
+    exibirAviso("Erro", "Senha não carregada. Faça login novamente.");
     return;
   }
 
   try {
     const conteudoCriptografado = await window.electronAPI.lerNota(nome);
-    const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senhaNota);
 
-    const partes = nome.substring(0, 10).split("-");
-    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+    localStorage.setItem("senhaCripto", senhaNota);
+    localStorage.setItem("conteudoCriptografado", conteudoCriptografado);
+    localStorage.setItem("dataNota", formatarDataBrasileira(nome.substring(0, 10)));
 
-    localStorage.setItem("notaSelecionada", JSON.stringify({ data: dataFormatada, conteudo }));
     window.open("nota.html", "_blank");
-  } catch (error) {
-    console.error("Erro ao visualizar nota:", error);
-    alert("Erro ao abrir a nota.");
+  } catch (err) {
+    console.error("❌ Erro ao abrir nota:", err);
+    exibirAviso("Erro", "Erro ao abrir a nota.");
   }
 }
