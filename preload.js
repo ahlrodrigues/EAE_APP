@@ -46,7 +46,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   enviarEmailContato: (assunto, mensagem) => ipcRenderer.invoke('enviarEmailContato', assunto, mensagem),
  // getSenhaCriptografia: () => ipcRenderer.invoke('get-senha-criptografia'),
   setSenhaCriptografia: (senha) => ipcRenderer.send('set-senha-criptografia', senha),
-  abrirNotaMulti: () => ipcRenderer.invoke("abrir-nota-multi"),
+  abrirNotaMulti: (html) => ipcRenderer.invoke('abrir-nota-multi', html),
   visualizarNota: (nome) => ipcRenderer.invoke("visualizar-nota", nome),
   listarNotas: () => ipcRenderer.invoke("listar-notas"),
   on: (canal, callback) => ipcRenderer.on(canal, callback), 

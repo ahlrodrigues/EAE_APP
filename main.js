@@ -22,6 +22,10 @@ const { criptografar, descriptografar } = require('./lib/crypto');
 const { redefinirSenha } = require('./lib/redefinirSenha');
 const { validarTokenDigitado } = require('./lib/validarToken');
 
+const { registrarVisualizacaoHandler } = require('./handlers/visualizacaoHandler.js');
+console.log("✅ Handler abrir-nota-multi registrado!");
+registrarVisualizacaoHandler(ipcMain);
+
 // 🔐 Armazenamento temporário da senha de descriptografia
 let senhaCriptografia = null;
 ipcMain.on('set-senha-criptografia', (_, senha) => { senhaCriptografia = senha; 
