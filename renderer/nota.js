@@ -12,6 +12,9 @@ function formatarDataTexto(conteudo) {
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("📦 DOM totalmente carregado");
 
+  // ✅ Envia evento ao main indicando que estamos prontos (se suportado)
+  window.electronAPI?.notifyReady?.();
+  
   const container = document.getElementById("conteudoNota");
   const titulo = document.getElementById("tituloNota");
 
@@ -20,8 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // ✅ Envia evento ao main indicando que estamos prontos (se suportado)
-  window.electronAPI?.notifyReady?.();
+  
 
   // ✅ Escuta os dados enviados via IPC após abertura da nota
   window.electronAPI.on("dados-da-nota", async (_, { conteudo, senha }) => {

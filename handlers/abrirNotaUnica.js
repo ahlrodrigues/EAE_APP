@@ -32,13 +32,11 @@ function registrarAbrirNotaUnicaHandler() {
 
     // ✅ Quando o renderer da nota disser que está pronto, envia os dados
     ipcMain.once("nota-ready", () => {
-      console.log("📨 Renderer nota pronto, enviando dados-da-nota...");
-      if (notaWin && notaWin.webContents) {
-        notaWin.webContents.send("dados-da-nota", { conteudo, senha });
-      } else {
-        console.warn("⚠️ notaWin ou webContents estão indisponíveis.");
-      }
+      console.log("📨 Renderer pronto, enviando dados-da-nota:", { conteudo, senha });
+      notaWin.webContents.send("dados-da-nota", { conteudo, senha });
     });
+    
+    await notaWin.loadFile(path.join(__dirname, "../pages/nota.html"));
 
     // ✅ Limpa referência após fechamento da janela
     notaWin.on("closed", () => {
