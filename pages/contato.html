@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      background: #ecfae0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -54,7 +54,7 @@
       padding: 0.75rem;
       border: none;
       border-radius: 8px;
-      background: #0077cc;
+      background: #28a745;
       color: white;
       font-weight: bold;
       font-size: 1rem;
@@ -62,7 +62,7 @@
       transition: background 0.3s ease;
     }
     button:hover {
-      background: #005fa3;
+      background: #1e7e34;
     }
     .alert-box {
       background-color: #ffdddd;
@@ -72,7 +72,7 @@
       margin-bottom: 10px;
       color: #800000;
       font-weight: bold;
-      max-width: 500px;
+      max-width: 1000px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -82,7 +82,7 @@
       margin-top: 1.5rem;
     }
     a {
-      color: #0066cc;
+      color: #28a745;
       text-decoration: none;
     }
   </style>
@@ -99,7 +99,13 @@
     <textarea id="mensagem" placeholder="Escreva sua mensagem aqui..." required></textarea>
     <button type="submit">Enviar</button>
   </form>
-
+  <div class="botoes" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+    <button onclick="location.href='index.html'">📄 Início</button>
+    <button onclick="location.href='notas.html'">📝 + Anotações</button>
+    <button onclick="location.href='relatorio.html'">📄 Relatório</button>
+    <button onclick="logout()">Sair</button>
+  </div>
+</br>
   <footer>
     <div class="alert-box">
       Este aplicativo não armazena dados em servidores. Todas as informações são salvas localmente no computador do usuário.
@@ -109,7 +115,11 @@
       <a href="https://github.com/ahlrodrigues" target="_blank">Desenvolvedores</a>
     </div>
   </footer>
-
+  <script>
+    function logout() {
+      window.location.href = 'login.html';
+    }
+  </script>
   <script>
     const form = document.getElementById('contatoForm');
 

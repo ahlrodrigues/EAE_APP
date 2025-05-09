@@ -9,8 +9,8 @@ function registrarVisualizacaoHandler(ipcMain) {
 
     try {
       const win = new BrowserWindow({
-        width: 1000,
-        height: 800,
+        width: 1200,
+        height: 900,
         title: 'Visualização das Notas',
         webPreferences: {
           contextIsolation: true,
