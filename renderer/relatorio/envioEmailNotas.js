@@ -108,7 +108,9 @@ async function enviarNotasPorEmail(botao = null) {
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', async (event) => {
     const target = event.target;
-    console.log("🖱️ Clique detectado:", target.id);
+    if (target.id.startsWith("btnEnviar") || target.id === "btnFecharModalEnvio") {
+      console.log("🖱️ Clique relevante detectado:", target.id);
+    }
 
     // ▶️ Botão "Enviar agora" do modal
     if (target.id === 'btnConfirmarEnvioEmail') {
@@ -127,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ❌ Botão de fechar o modal
     if (target.id === 'btnFecharModalEnvio') {
+      console.log("🚀 Botão 'Fechar modal' clicado");
       const modal = document.getElementById('modalEnvioEmail');
       if (modal) modal.style.display = 'none';
     }

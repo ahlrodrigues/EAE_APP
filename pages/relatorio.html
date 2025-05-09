@@ -228,9 +228,15 @@
   <footer>Relatório local — Escola de Aprendizes do Evangelho — 2025</footer>
 
   <!-- Scripts -->
+  <script type="module" src="../renderer/relatorio/acoesNotas.js"></script>
   <script type="module" src="../renderer/relatorio.js"></script>
   <script type="module" src="../renderer/relatorio/envioEmailNotas.js"></script>
   <script>
+    
+    console.log("📦 relatorio.js carregado!");
+    
+
+
     // Modal de envio de email (com visual elegante)
     const btnEnviarEmail = document.getElementById('btnEnviarEmailDirigente');
     const modal = document.getElementById('modalEnvioEmail');

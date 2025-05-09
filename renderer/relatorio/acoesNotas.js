@@ -1,4 +1,7 @@
+console.log("📦 acoesNotas.js carregado!");
+
 import { exibirAviso, exibirConfirmacao } from '../ui/modalAviso.js'; 
+import { renderizarTabela } from './renderTabela.js';
 
 export function inicializarAcoesNotas() {
   const btnVisualizar = document.getElementById("btnVisualizarSelecionados");
@@ -6,10 +9,12 @@ export function inicializarAcoesNotas() {
 
   if (btnVisualizar) {
     btnVisualizar.addEventListener("click", visualizarSelecionadas);
+    console.log("🚀 Botão 'visualizarSelecionadas' clicado");
   }
 
   if (btnExcluir) {
     btnExcluir.addEventListener("click", excluirSelecionadas);
+    console.log("🚀 Botão 'excluirSelecionadas' clicado");
   }
 }
 
@@ -26,6 +31,8 @@ async function visualizarSelecionadas() {
   const checkboxes = document.querySelectorAll(".seletor-nota:checked");
   for (const checkbox of checkboxes) {
     const nomeNota = checkbox.dataset.nome;
+    console.log("🗂️ Nota marcada:", nomeNota);
+
     try {
       const conteudoCriptografado = await window.electronAPI.lerNota(nomeNota);
       const conteudo = await window.electronAPI.descriptografar(conteudoCriptografado, senhaNota);
@@ -48,35 +55,39 @@ async function visualizarSelecionadas() {
   await window.electronAPI.abrirNotaMulti();}
 
 
-async function excluirSelecionadas() {
-  console.log("🔴 Botão excluir clicado"); // debug
-
-  const checkboxes = document.querySelectorAll(".seletor-nota:checked");
-
-  if (checkboxes.length === 0) {
-    exibirAviso("Nada selecionado", "Nenhuma nota foi selecionada para exclusão.");
-    return;
-  }
-
-  const confirmado = await exibirConfirmacao(
-    "Confirmar exclusão",
-    "Tem certeza que deseja excluir as notas selecionadas?"
-  );
-  if (!confirmado) return;
-
-  try {
-    for (const checkbox of checkboxes) {
-      const nomeNota = checkbox.dataset.nome;
-      await window.electronAPI.excluirNota(nomeNota);
+  async function excluirSelecionadas() {
+    console.log("🔴 Botão excluir clicado");
+  
+    const checkboxes = document.querySelectorAll(".seletor-nota:checked");
+    if (checkboxes.length === 0) {
+      exibirAviso("Nada selecionado", "Nenhuma nota foi selecionada para exclusão.");
+      return;
     }
-
-    const novosArquivos = await window.electronAPI.listarNotas();
-    const { renderizarTabela} = await import('./renderTabela.js');
-    renderizarTabela(novosArquivos);
-
-    exibirAviso("Sucesso", "Notas excluídas com sucesso!");
-  } catch (error) {
-    console.error("Erro ao excluir notas:", error);
-    exibirAviso("Erro", "Ocorreu um erro ao excluir as notas.");
+  
+    const confirmado = await exibirConfirmacao(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir as notas selecionadas?"
+    );
+    console.log("🟡 Resultado do exibirConfirmacao:", confirmado);
+    if (!confirmado) return;
+  
+    try {
+      for (const checkbox of checkboxes) {
+        const nomeNota = checkbox.dataset.nome;
+        console.log("🔍 electronAPI.excluirNota:", window.electronAPI.excluirNota);
+        await window.electronAPI.excluirNota(nomeNota);
+        console.log("✅ Exclusão requisitada para:", nomeNota);
+      }
+  
+      const novosArquivos = await window.electronAPI.listarNotas();
+      renderizarTabela(novosArquivos); // ✅ direto, sem import dinâmico
+      exibirAviso("Sucesso", "Notas excluídas com sucesso!");
+    } catch (error) {
+      console.error("Erro ao excluir notas:", error);
+      exibirAviso("Erro", "Ocorreu um erro ao excluir as notas.");
+    }
   }
-}
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    inicializarAcoesNotas();
+  })

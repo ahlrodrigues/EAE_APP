@@ -1,5 +1,5 @@
 console.log("MAIN.JS - Aplicação iniciando...");
-console.log("🧠 main.js ATIVO! Caminho:", __filename);
+
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
