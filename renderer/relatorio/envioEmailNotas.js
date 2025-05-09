@@ -1,10 +1,10 @@
 import { gerarCorpoEmailDirigente, gerarCorpoEmailAluno } from '../shared/emailTemplates.js';
 import { exibirAviso } from '../ui/modalAviso.js';
 
-// 🔒 Flag global para evitar envios duplicados
+// 🔒 Flag global para evitar múltiplos envios simultâneos
 let envioEmAndamento = false;
 
-async function enviarNotasPorEmail(btn = null) {
+async function enviarNotasPorEmail(botao = null) {
   if (envioEmAndamento) {
     console.warn("⚠️ Envio já em andamento. Ignorado.");
     return;
@@ -13,7 +13,14 @@ async function enviarNotasPorEmail(btn = null) {
   envioEmAndamento = true;
   console.log("📤 Iniciando envio de e-mails...");
 
+  // 🔄 Atualiza visual do botão
+  if (botao) {
+    botao.disabled = true;
+    botao.textContent = 'Enviando...';
+  }
+
   try {
+    // 🔍 Coleta as notas selecionadas
     const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked')?.value || 'unico';
 
@@ -26,14 +33,17 @@ async function enviarNotasPorEmail(btn = null) {
       return;
     }
 
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Enviando...';
+    // 👤 Coleta dados do usuário e senha
+    const usuario = await window.electronAPI.obterCadastro();
+    const senha = await window.electronAPI.getSenhaCriptografia();
+
+    console.log("🔑 Senha usada para descriptografar no envioEmailNotas.js:", senha);
+
+    if (!senha) {
+      throw new Error("Senha de descriptografia não encontrada. Faça login novamente.");
     }
 
-    const usuario = await window.electronAPI.obterCadastro();
-    const senha = await window.electronAPI.getSenhaUsuario();
-
+    // 🔓 Descriptografa as notas selecionadas
     const conteudos = await Promise.all(
       nomesNotas.map(async (nome) => {
         const cripto = await window.electronAPI.lerNota(nome);
@@ -41,15 +51,18 @@ async function enviarNotasPorEmail(btn = null) {
       })
     );
 
+    // 📄 Gera os anexos em PDF
     const anexos = await window.electronAPI.gerarPdfAnexosParaEmail(
       conteudos,
       nomesNotas,
       tipoEnvio
     );
 
+    // ✉️ Gera os corpos dos e-mails
     const corpoDirigente = gerarCorpoEmailDirigente(usuario.dirigente, usuario.aluno, 'pt');
     const corpoAluno = gerarCorpoEmailAluno(usuario.aluno, 'pt');
 
+    // 📤 Envia para dirigente
     console.log("📧 Enviando e-mail ao dirigente...");
     await window.electronAPI.enviarEmail({
       para: usuario.emailDirigente,
@@ -59,6 +72,7 @@ async function enviarNotasPorEmail(btn = null) {
       confirmarLeitura: null
     });
 
+    // 📤 Confirmação para aluno
     console.log("📧 Enviando e-mail de confirmação ao aluno...");
     await window.electronAPI.enviarEmail({
       para: usuario.email,
@@ -70,45 +84,48 @@ async function enviarNotasPorEmail(btn = null) {
 
     console.log("✅ E-mails enviados com sucesso!");
 
-    // Fecha o modal se estiver aberto
-    const modal = document.getElementById('modalEnvioEmail');
-    if (modal) modal.style.display = 'none';
+    // ✅ Fecha modal de envio (caso esteja aberto)
+    document.getElementById('modalEnvioEmail')?.classList.remove('ativo');
+    modal.style.display = 'none';
 
-    // Exibe o modal de aviso
+    // ✅ Exibe aviso de sucesso
     exibirAviso("✅ Sucesso", "E-mail enviado com sucesso!");
+
   } catch (erro) {
     console.error('❌ Erro ao enviar e-mail:', erro);
-    exibirAviso("❌ Erro", "Houve uma falha ao enviar o e-mail. Verifique os dados e tente novamente.");
+    exibirAviso("❌ Erro", erro.message || "Houve uma falha ao enviar o e-mail. Verifique os dados e tente novamente.");
   } finally {
+    // 🔄 Restaura botão
     envioEmAndamento = false;
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = 'Enviar agora';
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = 'Enviar agora';
     }
   }
 }
 
+// 📌 Inicializa os listeners após DOM carregado
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', async (event) => {
     const target = event.target;
     console.log("🖱️ Clique detectado:", target.id);
 
-    // Botão do modal "Enviar agora"
+    // ▶️ Botão "Enviar agora" do modal
     if (target.id === 'btnConfirmarEnvioEmail') {
-      event.preventDefault(); // Se estiver dentro de um <form>
+      event.preventDefault(); // Impede envio se dentro de um form
       console.log("🚀 Botão 'Enviar agora' clicado");
       await enviarNotasPorEmail(target);
       return;
     }
 
-    // Botão direto na tela de relatório
+    // ▶️ Botão direto na tela
     if (target.id === 'btnEnviarEmailDirigente') {
       console.log("🚀 Botão 'Enviar para Dirigente' clicado");
       await enviarNotasPorEmail(target);
       return;
     }
 
-    // Fechar o modal
+    // ❌ Botão de fechar o modal
     if (target.id === 'btnFecharModalEnvio') {
       const modal = document.getElementById('modalEnvioEmail');
       if (modal) modal.style.display = 'none';
