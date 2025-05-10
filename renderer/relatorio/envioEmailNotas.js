@@ -120,12 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ▶️ Botão direto na tela
-    if (target.id === 'btnEnviarEmailDirigente') {
-      console.log("🚀 Botão 'Enviar para Dirigente' clicado");
-      await enviarNotasPorEmail(target);
-      return;
-    }
+    // // ▶️ Botão direto na tela
+    // if (target.id === 'btnEnviarEmailDirigente') {
+    //   console.log("🚀 Botão 'Enviar para Dirigente' clicado");
+    //   await enviarNotasPorEmail(target);
+    //   return;
+    // }
 
     // ❌ Botão de fechar o modal
     if (target.id === 'btnFecharModalEnvio') {

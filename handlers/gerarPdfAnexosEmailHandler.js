@@ -3,6 +3,7 @@ const { BrowserWindow } = require('electron');
 function registrarGerarPdfAnexosEmailHandler(ipcMain) {
   ipcMain.handle('gerar-pdf-anexos-email', async (event, conteudos, nomes, tipo) => {
     const anexos = [];
+    console.log("📨 Iniciando geração de anexos. Tipo:", tipo);
 
     if (tipo === "unico") {
       const htmlUnico = `
@@ -42,9 +43,8 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
             <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" />
             <h2>ESCOLA DE APRENDIZES DO EVANGELHO</h2>
           </div>
-          ${conteudos.map((c, i) => `
+          ${conteudos.map((c) => `
             <div class="nota">
-              
               <pre>${c}</pre>
             </div>
           `).join('')}
@@ -68,8 +68,11 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
         console.error('❌ Erro ao gerar PDF único:', erro);
       }
 
-    } else {
+    } else if (tipo === "separado") {
       for (let i = 0; i < conteudos.length; i++) {
+        const conteudo = conteudos[i];
+        const nomeArquivo = nomes[i];
+
         const html = `
         <html>
           <head>
@@ -104,7 +107,7 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
               <h2>ESCOLA DE APRENDIZES DO EVANGELHO</h2>
             </div>
             <div class="nota">
-              <pre>${c.replace(nomes[i], '').trimStart()}</pre>
+              <pre>${conteudo.replace(nomeArquivo, '').trimStart()}</pre>
             </div>
           </body>
         </html>`;
@@ -116,20 +119,23 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
           await tempWin.close();
 
           anexos.push({
-            filename: nomes[i].replace(/\.[^/.]+$/, ".pdf"),
+            filename: nomeArquivo.replace(/\.[^/.]+$/, ".pdf"),
             content: pdf,
             contentType: 'application/pdf'
           });
 
-          console.log(`✅ PDF individual gerado: ${nomes[i]}`);
+          console.log(`✅ PDF individual gerado: ${nomeArquivo}`);
         } catch (erro) {
-          console.error(`❌ Erro ao gerar PDF da nota ${nomes[i]}:`, erro);
+          console.error(`❌ Erro ao gerar PDF da nota ${nomeArquivo}:`, erro);
         }
       }
+    } else {
+      console.warn("⚠ Tipo de envio não reconhecido:", tipo);
     }
 
-    return anexos; // ✅ Retorno obrigatório
+    return anexos;
   });
 }
+
 
 module.exports = { registrarGerarPdfAnexosEmailHandler };
