@@ -32,6 +32,7 @@ export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, lang = 'pt') 
             <tr>
               <td align="center" style="padding-bottom: 20px;">
                 <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" width="80" style="display: block;" />
+                <img src="https://email-tracker.vercel.app/api/pixel?aluno=${encodeURIComponent(aluno)}" width="1" height="1" style="display:none;" alt="." />
               </td>
             </tr>
             <tr>
