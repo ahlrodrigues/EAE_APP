@@ -4,53 +4,60 @@
   <meta charset="UTF-8" />
   <title>Anotação</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #ecfae0;
-      margin: 0;
-      padding: 0;
-    }
+    html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  }
 
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: #ecfae0;
+  flex: 1;
+}
 
-    header {
-      text-align: center;
-    }
+header {
+  text-align: center;
+}
 
-    header img {
-      max-width: 80px;
-      margin-bottom: 1rem;
-    }
+header img {
+  max-width: 100px;
+  margin-bottom: 1rem;
+}
 
-    header h1 {
-      font-size: 1.5rem;
-      margin: 0;
-      color: #333;
-    }
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #333;
+}
 
-    .nota {
-      margin-top: 2rem;
-      white-space: pre-wrap;
-      background: #fdfdfd;
-      padding: 1.5rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
+.nota {
+  flex-grow: 1;
+  margin: 2rem;
+  white-space: pre-wrap;
+  background: #fdfdfd;
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem; /* 👈 Aumenta o tamanho da fonte */
+  line-height: 1.6;    /* 👈 (opcional) melhora a legibilidade */
+}
 
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.85rem;
-      color: #777;
-    }
+footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #777;
+  padding: 1rem;
+}
+
   </style>
+  
   <script>
     function logout() {
       window.location.href = 'login.html';
@@ -58,21 +65,15 @@
   </script>
 </head>
 <body>
-  <div class="container">
-    <!-- <header>
-      <img src="../assets/trevo.png" alt="Logo Trevo">
-      <div id="tituloNota">Carregando título...</div>
-    </header> -->
-
+  
     <div class="nota" id="conteudoNota">
-      <!-- Conteúdo da nota será inserido aqui -->
+      <!-- Conteúdo da nota -->
     </div>
-  </div>
+  
 
   <footer>
     Visualização local — 2025
   </footer>
-
   <!-- Script JS -->
   <script type="module" src="../renderer/nota.js"></script>
 </body>

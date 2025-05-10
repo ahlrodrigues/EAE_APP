@@ -39,12 +39,12 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
         </head>
         <body>
           <div class="cabecalho">
-            <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Trevo da Escola" />
+            <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" />
             <h2>ESCOLA DE APRENDIZES DO EVANGELHO</h2>
           </div>
           ${conteudos.map((c, i) => `
             <div class="nota">
-              <h3>${nomes[i]}</h3>
+              
               <pre>${c}</pre>
             </div>
           `).join('')}
@@ -100,7 +100,7 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
           </head>
           <body>
             <div class="cabecalho">
-              <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Trevo da Escola" />
+              <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" style="width: 100px; margin-bottom: 10px;" />
               <h2>ESCOLA DE APRENDIZES DO EVANGELHO</h2>
             </div>
             <div class="nota">

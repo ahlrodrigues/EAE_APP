@@ -26,18 +26,20 @@ function registrarVisualizacaoHandler(ipcMain) {
           <meta charset="utf-8">
           <title>Notas</title>
           <style>
-            
+            html, body {
+            background: #ecfae0;
+            }
             body {
-               font-family: Arial, sans-serif;
+              font-family: Arial, sans-serif;
               padding: 2rem;
-              background: #f9f9f9;
+              background: #ecfae0;
               color: #333;
-  }
+             }
             .notaVisualizada {
               border: 1px solid #ccc;
               border-radius: 8px;
               background: white;
-              padding: 1rem;
+              padding: 1.5rem;
               margin-bottom: 1.5rem;
               box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             }
@@ -54,7 +56,7 @@ function registrarVisualizacaoHandler(ipcMain) {
         </head>
         <body>
         <div style="text-align: center; margin-bottom: 2rem;">
-        <img src="https://siagutatemp.wordpress.com/wp-content/uploads/2015/05/9e10b-trevo.png" alt="Logo Trevo" style="max-height: 80px;">
+        <img src="../assets/trevo.png" alt="Logo Trevo" style="width: 100px; margin-bottom: 10px;" />
         <h1 style="margin-top: 1rem;">Escola de Aprendizes do Evangelho</h1>
         </div>
           ${conteudoHTML}

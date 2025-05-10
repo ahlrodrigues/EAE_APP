@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const formatado = formatarDataTexto(textoDescriptografado);
 
       container.innerHTML = `
-        <img src="../assets/trevo.png" alt="Logo Trevo" style="display:block;margin:0 auto 1rem auto;max-width:80px;" />
+        <img src="../assets/trevo.png" alt="Logo Trevo" style="width: 100px; margin-bottom: 10px;" />
         <pre style="background: #f9f9f9; padding: 1rem; border: 1px solid #ccc; border-radius: 8px;">
 ${formatado}
         </pre>

@@ -5,7 +5,6 @@ const { listarNotas } = require("../handlers/listarNotas");
 
 
 function registrarNotasHandlers(ipcMain) {
-  // ✅ Corrigido: movido para dentro da função
   ipcMain.handle('listar-notas', async () => {
     return listarNotas();
   });

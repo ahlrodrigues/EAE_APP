@@ -96,11 +96,50 @@ async function visualizarSelecionadas() {
   }
 
   // 📄 Gera o conteúdo HTML das notas para visualização
-  const conteudoHTML = notas.map(nota => `
+  const conteudoHTML = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Notas Selecionadas</title>
+  <style>
+    body {
+      background: #ecfae0;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      margin: 0;
+    }
+    .notaVisualizada {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  font-size: 1rem; /* ✅ Aumenta a fonte */
+  line-height: 1.6;  /* ✅ Opcional: melhora a leitura */
+}
+    hr {
+      border: none;
+      border-top: 1px dashed #999;
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+  ${notas.map(nota => `
     <div class="notaVisualizada">
-     <pre>${nota.conteudo}</pre>
+      <pre>${nota.conteudo}</pre>
     </div>
-  `).join(""); // ⚠️ Sem <hr>, sem vírgulas
+  `).join("")}
+</body>
+</html>
+`;
 
   console.log("📦 HTML gerado para visualização:", conteudoHTML);
 
