@@ -225,6 +225,7 @@
     </div>
   </div>
 
+  
   <!-- Modal de envio de e-mail -->
   <div id="modalEnvioEmail" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="width: 90%; max-width: 500px;">
@@ -289,6 +290,11 @@
     function logout() {
       window.location.href = 'login.html';
     }
+  </script>
+  <script>
+    document.getElementById('fecharModalExportar')?.addEventListener('click', () => {
+      document.getElementById('modalExportar').style.display = 'none';
+    });
   </script>
 </body>
 </html>

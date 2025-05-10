@@ -104,7 +104,7 @@ function registrarGerarPdfAnexosEmailHandler(ipcMain) {
               <h2>ESCOLA DE APRENDIZES DO EVANGELHO</h2>
             </div>
             <div class="nota">
-              <pre>${conteudos[i]}</pre>
+              <pre>${c.replace(nomes[i], '').trimStart()}</pre>
             </div>
           </body>
         </html>`;
