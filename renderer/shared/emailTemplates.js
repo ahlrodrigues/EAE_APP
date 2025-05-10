@@ -22,7 +22,7 @@ export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, lang = 'pt') 
   };
 
   const t = textos[lang];
-
+  
   return `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9f9f9">
       <tr>
@@ -32,7 +32,7 @@ export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, lang = 'pt') 
             <tr>
               <td align="center" style="padding-bottom: 20px;">
                 <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" width="80" style="display: block;" />
-                <img src="https://email-tracker.vercel.app/api/pixel?aluno=${encodeURIComponent(aluno)}" width="1" height="1" style="display:none;" alt="." />
+                <img src="https://email-tracker.vercel.app/api/pixel?aluno=${encodeURIComponent(nomeAluno)}" width="1" height="1" style="display:none;" alt="." />
               </td>
             </tr>
             <tr>
@@ -77,7 +77,7 @@ export function gerarCorpoEmailAluno(nomeAluno, lang = 'pt') {
   };
 
   const t = textos[lang];
-
+  
   return `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9f9f9">
       <tr>
@@ -87,7 +87,7 @@ export function gerarCorpoEmailAluno(nomeAluno, lang = 'pt') {
             <tr>
               <td align="center" style="padding-bottom: 20px;">
                 <img src="https://geea.com.br/imagem/trevo.png" alt="Trevo da Escola" width="80" style="display: block;" />
-              </td>
+<img src="https://email-tracker.vercel.app/api/pixel?aluno=${encodeURIComponent(nomeAluno)}" width="1" height="1" style="display:none;" alt="." />             </td>
             </tr>
             <tr>
               <td align="center" style="padding-bottom: 10px;">
