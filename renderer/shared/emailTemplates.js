@@ -5,7 +5,7 @@
  * @param {'pt' | 'en'} lang
  * @returns {string} HTML formatado
  */
-export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, lang = 'pt') {
+export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, emailAluno, lang = 'pt') {
   const textos = {
     pt: {
       saudacao: `Olá ${nomeDirigente},`,
@@ -60,7 +60,7 @@ export function gerarCorpoEmailDirigente(nomeDirigente, nomeAluno, lang = 'pt') 
  * @param {'pt' | 'en'} lang
  * @returns {string} HTML formatado
  */
-export function gerarCorpoEmailAluno(nomeAluno, lang = 'pt') {
+export function gerarCorpoEmailAluno(nomeAluno, emailAluno, lang = 'pt') {
   const textos = {
     pt: {
       saudacao: `Olá ${nomeAluno},`,
